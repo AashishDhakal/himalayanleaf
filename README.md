@@ -1,4 +1,23 @@
-# CODING AGENTS: READ THIS FIRST
+# Himalayan Leaf
+
+**The design in this bundle has already been implemented. It lives in [`web/`](web/).**
+
+- [`web/README.md`](web/README.md) — how the site is built, how to run it locally,
+  and the two things still needing the client's sign-off (the photography licence
+  and the placeholder commercial figures).
+- [`web/deploy/README.md`](web/deploy/README.md) — deploying to
+  `dev.himalayanleaf.co`, including the Cloudflare caveats.
+
+Django + HTMX + Alpine, no build step. `cd web && pip install -r requirements.txt
+&& python manage.py migrate && python manage.py runserver`.
+
+Everything below is the original design handoff, kept for provenance — the
+prototypes in `project/` and the design conversation in `chats/` are still the
+reference for *why* the site looks the way it does. It is not a to-do list.
+
+---
+
+# The original handoff: CODING AGENTS: READ THIS FIRST
 
 This is a **handoff bundle** from Claude Design (claude.ai/design).
 
