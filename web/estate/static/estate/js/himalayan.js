@@ -141,7 +141,7 @@ document.addEventListener("alpine:init", () => {
         const at = parseFloat(el.dataset.at);
         const d = Math.abs(this.p - at);
         const on = i === 0 ? this.p < at + SPAN : i === last ? this.p >= at - SPAN * 0.5 : d < SPAN;
-        el.style.opacity = on ? Math.max(0.3, 0.86 - d * 1.1).toFixed(3) : "0";
+        el.style.opacity = on ? Math.max(0.35, 0.96 - d * 1.1).toFixed(3) : "0";
         el.style.transform =
           `scale(${(1.06 + this.p * 0.14).toFixed(3)}) ` +
           `translate3d(calc(var(--lean) * 12px), ${((this.p - at) * -60).toFixed(1)}px, 0)`;
