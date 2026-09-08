@@ -218,12 +218,6 @@
 
       <div class="hl-ascent__scrim" aria-hidden="true"></div>
 
-      <div class="hl-ascent__ridges" aria-hidden="true">
-        {% for r in ridges %}
-          <div class="hl-ridge" style="height: {{ r.height }}%; background: {{ r.colour }}; border-radius: {{ r.radius }}; --drop: {{ r.drop }}%; --grow: {{ r.grow }}; --lean-px: {{ r.lean }}px;"></div>
-        {% endfor %}
-      </div>
-
       <div class="hl-ascent__type">
         <div>
           <div class="hl-ascent__altitude" x-text="altitude">240</div>

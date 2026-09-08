@@ -1004,24 +1004,10 @@ img { max-width: 100%; }
   z-index: 1;
   background: linear-gradient(180deg, var(--ink) 0%, rgba(14,32,24,0.5) 26%, rgba(14,32,24,0.28) 55%, rgba(10,25,18,0.85) 88%, var(--ink-ritual) 100%);
 }
-.hl-ascent__ridges {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 2;
-}
-.hl-ridge {
-  position: absolute;
-  left: -18%; right: -18%;
-  /* Sinks as --p climbs: the valley silhouettes fall out of frame and the
-     photographs behind them carry the section. */
-  bottom: calc(-14% - var(--p) * var(--drop));
-  transform: translate3d(calc(var(--lean) * var(--lean-px)), 0, 0) scale(calc(1 + var(--p) * var(--grow)));
-  transition: transform 1s cubic-bezier(0.2, 0.8, 0.2, 1), bottom 0.5s linear;
-}
-/* Above the ridges (z-index 2), below the markers and the credit. In the
-   prototype this layer had no z-index at all, so the opaque ridge silhouettes
-   painted straight over the altitude counter and the line. */
+/* Above the photographs and the scrim, below the markers and the credit.
+   The design prototype declared a set of ridge silhouettes for this layer
+   but never rendered them; the section is the photographs, the scrim and
+   the type. */
 .hl-ascent__type {
   position: absolute;
   inset: 0;
