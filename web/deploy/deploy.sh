@@ -16,7 +16,9 @@ say() { printf '\n\033[1m%s\033[0m\n' "$*"; }
 
 say "Fetching $BRANCH"
 git -C "$APP_DIR" fetch --prune origin
-git -C "$APP_DIR" checkout "$BRANCH"
+# --force: anything edited by hand in the checkout is discarded, same as the
+# reset below — a stray local change must not be able to block a deploy.
+git -C "$APP_DIR" checkout --force "$BRANCH"
 before=$(git -C "$APP_DIR" rev-parse HEAD)
 git -C "$APP_DIR" reset --hard "origin/$BRANCH"
 after=$(git -C "$APP_DIR" rev-parse HEAD)
