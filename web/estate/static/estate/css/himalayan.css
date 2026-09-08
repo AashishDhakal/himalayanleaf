@@ -1013,7 +1013,9 @@ img { max-width: 100%; }
 .hl-ridge {
   position: absolute;
   left: -18%; right: -18%;
-  bottom: calc(-14% + var(--p) * var(--climb));
+  /* Sinks as --p climbs: the valley silhouettes fall out of frame and the
+     photographs behind them carry the section. */
+  bottom: calc(-14% - var(--p) * var(--drop));
   transform: translate3d(calc(var(--lean) * var(--lean-px)), 0, 0) scale(calc(1 + var(--p) * var(--grow)));
   transition: transform 1s cubic-bezier(0.2, 0.8, 0.2, 1), bottom 0.5s linear;
 }

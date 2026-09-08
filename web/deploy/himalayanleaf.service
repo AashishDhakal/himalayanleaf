@@ -6,7 +6,7 @@ Wants=network-online.target
 
 [Service]
 Type=notify
-User=padhaisewa
+User=himalayanleaf
 Group=www-data
 WorkingDirectory=/srv/himalayanleaf/web
 
@@ -27,6 +27,9 @@ RestartSec=5
 # a deploy never touches it.
 RuntimeDirectory=himalayanleaf
 RuntimeDirectoryMode=0755
+# The socket unit owns gunicorn.sock inside this directory; without this, stopping
+# the service deletes the directory and the socket file with it (502 after restart).
+RuntimeDirectoryPreserve=yes
 StateDirectory=himalayanleaf
 StateDirectoryMode=0750
 

@@ -82,9 +82,13 @@ def _home_context():
             {"colour": "#0A1B14", "height": 78, "parallax": 0.16, "lean": 52, "scale": 1.18},
         ],
         "ridges": [
-            # climb/grow are the scroll-driven parts: bottom rises by `climb`
-            # and the band scales by `grow` across the full ascent.
-            dict(r, climb=round(r["speed"] * 62, 3), grow=round(r["speed"] * 0.5, 4))
+            # drop/grow are the scroll-driven parts. Each band starts as a
+            # silhouette over the valley and sinks below the frame by `drop`
+            # (viewport %) across the full ascent — nearest bands (highest
+            # speed) fall fastest — while scaling up by `grow` as they pass.
+            # The tallest needs to travel well past its own height plus the
+            # -14% anchor to clear the bottom edge, hence the 140 factor.
+            dict(r, drop=round(r["speed"] * 140, 3), grow=round(r["speed"] * 0.5, 4))
             for r in [
                 {"colour": "#1D4231", "height": 30, "speed": 0.06, "lean": 8, "radius": "48% 52% 0 0 / 86% 72% 0 0"},
                 {"colour": "#16362A", "height": 42, "speed": 0.16, "lean": 20, "radius": "54% 47% 0 0 / 89% 76% 0 0"},

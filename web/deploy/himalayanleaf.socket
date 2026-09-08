@@ -3,7 +3,7 @@ Description=Himalayan Leaf gunicorn socket
 
 [Socket]
 ListenStream=/run/himalayanleaf/gunicorn.sock
-SocketUser=padhaisewa
+SocketUser=himalayanleaf
 SocketGroup=www-data
 SocketMode=0660
 

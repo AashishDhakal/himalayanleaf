@@ -1,14 +1,17 @@
 # Deploying to dev.himalayanleaf.co
 
-Assumes Ubuntu/Debian with systemd and nginx, and the `padhaisewa` user on the
-VPS. Adjust `User=`/`Group=` in `himalayanleaf.service` and `.socket` if not.
+Assumes Ubuntu/Debian with systemd and nginx. The app runs as a dedicated
+`himalayanleaf` system user (created in step 2 below); adjust `User=`/`Group=` in
+`himalayanleaf.service` and `.socket` if you pick a different name. The VPS is a
+shared box (`ssh padhaisewa` lands you as root) that already hosts other sites
+under nginx 1.24, so nothing here removes or replaces existing site configs.
 
 Layout this produces:
 
 ```
 /srv/himalayanleaf/          the git checkout (web/ is the Django project)
 /srv/himalayanleaf/venv/     virtualenv
-/etc/himalayanleaf/env       secrets — root:padhaisewa, chmod 640
+/etc/himalayanleaf/env       secrets — root:himalayanleaf, chmod 640
 /var/lib/himalayanleaf/      SQLite database + uploaded media (survives deploys)
 /run/himalayanleaf/          gunicorn socket
 ```
@@ -35,35 +38,44 @@ CSS/JS changes bust themselves, but purge the cache after the first deploy.
 sudo apt update
 sudo apt install -y python3-venv python3-pip nginx git certbot python3-certbot-nginx
 
-# 2. checkout
+# 2. service user + checkout
+sudo useradd --system --home-dir /srv/himalayanleaf --no-create-home \
+    --shell /usr/sbin/nologin --gid www-data himalayanleaf
 sudo mkdir -p /srv/himalayanleaf
-sudo chown padhaisewa:padhaisewa /srv/himalayanleaf
-git clone https://github.com/AashishDhakal/himalayanleaf.git /srv/himalayanleaf
+sudo chown himalayanleaf:www-data /srv/himalayanleaf
+sudo -u himalayanleaf git clone https://github.com/AashishDhakal/himalayanleaf.git /srv/himalayanleaf
+sudo git config --system --add safe.directory /srv/himalayanleaf   # so root can run git here too
 cd /srv/himalayanleaf
 
-# 3. virtualenv
-python3 -m venv venv
-./venv/bin/pip install --upgrade pip
-./venv/bin/pip install -r web/requirements.txt
+# 3. virtualenv (as the service user, so the checkout stays owned by it)
+sudo -u himalayanleaf -H python3 -m venv venv
+sudo -u himalayanleaf -H ./venv/bin/pip install --upgrade pip
+sudo -u himalayanleaf -H ./venv/bin/pip install -r web/requirements.txt
 
 # 4. secrets
 sudo mkdir -p /etc/himalayanleaf
 sudo cp web/deploy/env.example /etc/himalayanleaf/env
-./venv/bin/python -c "from django.core.management.utils import get_random_secret_key as k; print(k())"
+./venv/bin/python -c "from django.utils.crypto import get_random_string as r; print(r(64, \"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\"))"
 sudo nano /etc/himalayanleaf/env          # paste the key into DJANGO_SECRET_KEY
-sudo chown root:padhaisewa /etc/himalayanleaf/env
+# The key generator above is deliberately alphanumeric: this file is both a systemd
+# EnvironmentFile and `source`d by deploy.sh, and Django's default generator emits
+# characters like `(` and `$` that break the latter.
+sudo chown root:www-data /etc/himalayanleaf/env
 sudo chmod 640 /etc/himalayanleaf/env
 
 # 5. writable state
 sudo mkdir -p /var/lib/himalayanleaf/media
-sudo chown -R padhaisewa:www-data /var/lib/himalayanleaf
+sudo chown -R himalayanleaf:www-data /var/lib/himalayanleaf
 sudo chmod 750 /var/lib/himalayanleaf
 
-# 6. database, static files, admin login
-set -a; source /etc/himalayanleaf/env; set +a
-./venv/bin/python web/manage.py migrate
-./venv/bin/python web/manage.py collectstatic --noinput
-./venv/bin/python web/manage.py createsuperuser
+# 6. database, static files, admin login — as the service user, or the SQLite file
+#    ends up owned by root and gunicorn cannot write it
+sudo -u himalayanleaf -H bash -c '
+  set -a; source /etc/himalayanleaf/env; set +a
+  ./venv/bin/python web/manage.py migrate
+  ./venv/bin/python web/manage.py collectstatic --noinput
+  ./venv/bin/python web/manage.py createsuperuser
+'
 
 # 7. service
 sudo cp web/deploy/himalayanleaf.socket web/deploy/himalayanleaf.service /etc/systemd/system/
@@ -71,14 +83,24 @@ sudo systemctl daemon-reload
 sudo systemctl enable --now himalayanleaf.socket himalayanleaf
 systemctl status himalayanleaf --no-pager
 
-# 8. nginx — HTTP first, so certbot has something to work with
+# 8. nginx — HTTP first, so certbot has something to work with. nginx.conf
+#    references certs that do not exist yet, so `nginx -t` rejects it until
+#    certbot has run; stage a port-80-only block first.
 sudo mkdir -p /var/www/certbot
-sudo cp web/deploy/nginx.conf /etc/nginx/sites-available/dev.himalayanleaf.co
+sudo tee /etc/nginx/sites-available/dev.himalayanleaf.co >/dev/null <<'NG'
+server {
+    listen 80; listen [::]:80;
+    server_name dev.himalayanleaf.co;
+    location /.well-known/acme-challenge/ { root /var/www/certbot; }
+    location / { return 404; }
+}
+NG
 sudo ln -sf /etc/nginx/sites-available/dev.himalayanleaf.co /etc/nginx/sites-enabled/
-sudo rm -f /etc/nginx/sites-enabled/default
-
-# The config references certs that do not exist yet, so get them first:
+sudo nginx -t && sudo systemctl reload nginx
 sudo certbot certonly --webroot -w /var/www/certbot -d dev.himalayanleaf.co
+
+# Now the real config:
+sudo cp web/deploy/nginx.conf /etc/nginx/sites-available/dev.himalayanleaf.co
 sudo nginx -t && sudo systemctl reload nginx
 ```
 
@@ -95,18 +117,20 @@ package — `systemctl list-timers certbot.timer` to confirm.
 ## Every deploy after that
 
 ```bash
-/srv/himalayanleaf/web/deploy/deploy.sh
+sudo -u himalayanleaf /srv/himalayanleaf/web/deploy/deploy.sh
 ```
 
 It fetches, installs, migrates, collects static, runs `check --deploy`, restarts
 the service and smoke-tests the live URL. `BRANCH=some-branch deploy.sh` to
-deploy something other than `main`.
+deploy something other than `main`. The service user has no login shell, hence
+`sudo -u`. Note it does `git reset --hard`, so anything edited in the checkout on
+the VPS is lost — change deploy files in the repo and push.
 
 The script calls `sudo systemctl restart`. Give the service user just that, via
 `sudo visudo -f /etc/sudoers.d/himalayanleaf`:
 
 ```
-padhaisewa ALL=(root) NOPASSWD: /bin/systemctl restart himalayanleaf
+himalayanleaf ALL=(root) NOPASSWD: /bin/systemctl restart himalayanleaf
 ```
 
 ## When something is wrong

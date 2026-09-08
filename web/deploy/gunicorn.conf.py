@@ -28,3 +28,7 @@ loglevel = os.environ.get("GUNICORN_LOG_LEVEL", "info")
 access_log_format = '%({x-forwarded-for}i)s %(m)s %(U)s %(s)s %(L)ss'
 
 forwarded_allow_ips = "*"  # only nginx on localhost can reach the socket
+
+# gunicorn 26 opens a control socket, defaulting to $HOME/.gunicorn, which is
+# read-only under the unit's ProtectSystem=strict. Keep it in the RuntimeDirectory.
+control_socket = os.environ.get("GUNICORN_CONTROL_SOCKET", "/run/himalayanleaf/gunicorn.ctl")
