@@ -1,0 +1,11 @@
+[Unit]
+Description=Himalayan Leaf gunicorn socket
+
+[Socket]
+ListenStream=/run/himalayanleaf/gunicorn.sock
+SocketUser=padhaisewa
+SocketGroup=www-data
+SocketMode=0660
+
+[Install]
+WantedBy=sockets.target

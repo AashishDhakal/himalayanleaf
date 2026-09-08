@@ -1,0 +1,44 @@
+[Unit]
+Description=Himalayan Leaf (gunicorn)
+Requires=himalayanleaf.socket
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=notify
+User=padhaisewa
+Group=www-data
+WorkingDirectory=/srv/himalayanleaf/web
+
+# Secrets and host config live here, not in the repo. Owned by root, mode 0640,
+# group-readable by the service user.
+EnvironmentFile=/etc/himalayanleaf/env
+
+ExecStart=/srv/himalayanleaf/venv/bin/gunicorn \
+    --config /srv/himalayanleaf/web/deploy/gunicorn.conf.py \
+    config.wsgi:application
+
+ExecReload=/bin/kill -s HUP $MAINPID
+KillMode=mixed
+Restart=on-failure
+RestartSec=5
+
+# Writable state (SQLite database, uploaded media) lives outside the checkout so
+# a deploy never touches it.
+RuntimeDirectory=himalayanleaf
+RuntimeDirectoryMode=0755
+StateDirectory=himalayanleaf
+StateDirectoryMode=0750
+
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/himalayanleaf /srv/himalayanleaf/web/staticfiles
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+
+[Install]
+WantedBy=multi-user.target
