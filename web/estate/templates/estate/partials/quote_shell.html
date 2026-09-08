@@ -1,0 +1,28 @@
+{% comment %}
+The ceremony shell. HTMX never swaps this — only the stage inside it — so the
+brew fill and glow keep their CSS transitions running from one step to the next.
+{% endcomment %}
+<div class="hl-ceremony"
+     x-data="hlCeremony({{ progress|stringformat:'.4f' }}, '{{ liquor }}')"
+     @hl-brew.window="onBrew($event)"
+     role="dialog" aria-modal="true" aria-label="Request a quote">
+
+  <div class="hl-ceremony__glow" aria-hidden="true"></div>
+  <div class="hl-ceremony__fill" aria-hidden="true"></div>
+
+  <div class="hl-ceremony__steam" aria-hidden="true">
+    {% for s in steam %}
+      <div class="hl-steam" style="left: {{ s.x }}px; width: {{ s.w }}px; --dur: {{ s.dur }}s; --delay: {{ s.delay }}s; --off: {{ s.off }};"></div>
+    {% endfor %}
+  </div>
+
+  <div class="hl-ceremony__inner">
+    <div class="hl-ceremony__head">
+      <span class="hl-ceremony__mark">Himalayan Leaf</span>
+      <a class="hl-quiet" href="{% url 'estate:home' %}" data-close
+         hx-get="{% url 'estate:quote_close' %}" hx-target="#hl-quote" hx-swap="innerHTML">Close</a>
+    </div>
+
+    {% include "estate/partials/quote_stage.html" %}
+  </div>
+</div>

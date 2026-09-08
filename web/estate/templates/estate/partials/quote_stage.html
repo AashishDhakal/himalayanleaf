@@ -1,0 +1,100 @@
+{% comment %}
+One step of the ceremony. HTMX replaces this whole block per step; Alpine decides
+within a step when Continue lights up. The shell around it is never swapped, so
+the brew fill keeps transitioning.
+{% endcomment %}
+<div id="hl-quote-stage" class="hl-ceremony__body">
+
+  <div class="hl-pips" aria-hidden="true">
+    {% for on in pips %}<div class="hl-pip" data-on="{{ on|yesno:'true,false' }}"></div>{% endfor %}
+  </div>
+
+  <div class="hl-ceremony__stage">
+    {% if step.is_done %}
+      {# Finished — nothing left to post. #}
+      <div class="hl-quote-step">
+        <div class="hl-eyebrow">{{ step.tag }}</div>
+        <h2 class="hl-quote-step__question">{{ step.question }}</h2>
+        <p class="hl-quote-step__hint">{{ step.hint }}</p>
+        <div class="hl-reference">reference {{ reference }} · reply within two working days</div>
+        <div class="hl-quote-step__actions">
+          <a class="hl-pill hl-pill--solid" href="{% url 'estate:home' %}" data-close
+             hx-get="{% url 'estate:quote_close' %}" hx-target="#hl-quote" hx-swap="innerHTML">Return to the estate</a>
+        </div>
+      </div>
+
+    {% else %}
+      <form class="hl-quote-step"
+            hx-post="{% url 'estate:quote_step' %}"
+            hx-target="#hl-quote-stage"
+            hx-swap="outerHTML"
+            x-data="hlStep({{ step_config }})"
+            @change="sync()" @input="sync()">
+        {% csrf_token %}
+        <input type="hidden" name="step" value="{{ step_index }}">
+
+        <div class="hl-eyebrow">{{ step.tag }}</div>
+        <h2 class="hl-quote-step__question">{{ step.question }}</h2>
+        <p class="hl-quote-step__hint">{{ step.hint }}</p>
+
+        {% if step.is_choice %}
+          <div class="hl-options" role="group" aria-label="{{ step.question }}">
+            {% for option in step.options %}
+              <label class="hl-option">
+                <input type="{% if step.multi %}checkbox{% else %}radio{% endif %}"
+                       name="{{ step.key }}" value="{{ option }}"
+                       {% if step.multi %}{% if option in selected %}checked{% endif %}
+                       {% else %}{% if option == selected %}checked{% endif %} @change="choose()"{% endif %}>
+                {{ option }}
+              </label>
+            {% endfor %}
+          </div>
+
+        {% elif step.is_text %}
+          <div class="hl-fields">
+            {% for field in form_fields %}
+              <div>
+                <label class="hl-field__label" for="hl-f-{{ field.key }}">{{ field.label }}</label>
+                <input class="hl-field__input" id="hl-f-{{ field.key }}" type="{{ field.type }}"
+                       name="{{ field.key }}" value="{{ field.value }}"
+                       placeholder="{{ field.placeholder }}" autocomplete="{{ field.autocomplete }}">
+              </div>
+            {% endfor %}
+          </div>
+
+        {% elif step.is_notes %}
+          <div class="hl-notes">
+            <label class="hl-sr" for="hl-notes">{{ step.question }}</label>
+            <textarea id="hl-notes" name="notes" rows="4"
+                      placeholder="Anything else we should know — blend intentions, certification needs, sample requests.">{{ notes_value }}</textarea>
+          </div>
+
+        {% elif step.is_review %}
+          <div class="hl-summary">
+            {% for key, value in summary %}
+              <div class="hl-summary__cell">
+                <div class="hl-spec__key">{{ key }}</div>
+                <div class="hl-spec__value">{{ value }}</div>
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+
+        <div class="hl-quote-step__actions">
+          <button type="submit" name="action" value="next" class="hl-pill"
+                  :class="{'hl-pill--solid': filled, 'hl-pill--muted': !filled}"
+                  :disabled="!filled"
+                  x-text="filled ? '{{ ready_label }}' : 'Choose to continue'">{{ next_label }}</button>
+          {% if can_back %}
+            <button type="submit" name="action" value="back" class="hl-quiet" formnovalidate>Back</button>
+          {% endif %}
+          {% if step.skippable %}
+            <button type="submit" name="action" value="skip" class="hl-quiet hl-skip" formnovalidate>Skip</button>
+          {% endif %}
+        </div>
+      </form>
+    {% endif %}
+  </div>
+
+  <div class="hl-brew-label">{{ brew_label }}</div>
+</div>

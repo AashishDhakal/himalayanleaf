@@ -1,0 +1,305 @@
+{% extends "estate/base.html" %}
+{% load static %}
+
+{% block body %}
+
+{# ── the brew-in intro: a cup filling with liquor ─────────────────────────── #}
+<div class="hl-intro" x-show="introVisible" x-cloak aria-hidden="true">
+  <div class="hl-intro__wash"></div>
+  <div class="hl-intro__steam">
+    {% for s in steam %}
+      <div class="hl-steam" style="left: {{ s.x }}px; width: {{ s.w }}px; --dur: {{ s.dur }}s; --delay: {{ s.delay }}s; --off: {{ s.off }};"></div>
+    {% endfor %}
+  </div>
+  <div class="hl-intro__mark">
+    <div class="hl-cup">
+      <div class="hl-cup__wisps">
+        <div class="hl-cup__wisp hl-cup__wisp--1"></div>
+        <div class="hl-cup__wisp hl-cup__wisp--2"></div>
+        <div class="hl-cup__wisp hl-cup__wisp--3"></div>
+      </div>
+      <div class="hl-cup__body">
+        <div class="hl-cup__handle"></div>
+        <div class="hl-cup__vessel"><div class="hl-cup__liquor"></div></div>
+      </div>
+      <div class="hl-cup__saucer"></div>
+    </div>
+    <div class="hl-intro__word">Himalayan Leaf</div>
+    <div class="hl-intro__pct">steeping · <span x-text="introPct + '%'">0%</span></div>
+  </div>
+</div>
+
+{# ── ambient layers: the cursor drop, its ripples, drifting leaves ────────── #}
+<div class="hl-cursor" aria-hidden="true"></div>
+<div class="hl-ripples" aria-hidden="true">
+  <template x-for="r in ripples" :key="r.id">
+    <div class="hl-ripple" :style="`left:${r.x}px; top:${r.y}px`"></div>
+  </template>
+</div>
+<div class="hl-leaves" aria-hidden="true">
+  {% for d in drift %}
+    <div class="hl-leaf" style="left: {{ d.left }}%; width: {{ d.w }}px; height: {{ d.h }}px; background: {{ d.colour }}; --dur: {{ d.dur }}s; --delay: {{ d.delay }}s; --dx: {{ d.dx }}px; --spin: {{ d.spin }}deg;"></div>
+  {% endfor %}
+</div>
+
+{# ── the pour: a sheet of liquor down the screen between lots ─────────────── #}
+<div class="hl-veil-layer" x-show="pouring" x-cloak aria-hidden="true">
+  <div class="hl-veil" :style="`--veil-liquor: ${liquor}`"></div>
+</div>
+
+<header class="hl-header">
+  <a class="hl-logotype" href="{% url 'estate:home' %}">Himalayan Leaf</a>
+  <nav class="hl-nav" aria-label="Sections">
+    <a class="hl-nav__item" data-keep="820" href="#estate">Estate</a>
+    <a class="hl-nav__item" data-keep="0" href="#collection">The Teas</a>
+    <a class="hl-nav__item" data-keep="1180" href="#ascent">Ascent</a>
+    <a class="hl-nav__item" data-keep="1180" href="#ritual">Ritual</a>
+    <a class="hl-nav__item" data-keep="1060" href="#wholesale">Private Label</a>
+    <a class="hl-nav__cta" href="{% url 'estate:quote_open' %}"
+       hx-get="{% url 'estate:quote_open' %}" hx-target="#hl-quote" hx-swap="innerHTML">Request a Quote</a>
+  </nav>
+</header>
+
+<main>
+
+  {# ── hero: a timelapse of the Ilam gardens, steam rising in front ───────── #}
+  <section class="hl-hero" aria-labelledby="hl-hero-title">
+    <div class="hl-hero__ground"></div>
+
+    <div class="hl-hero__film">
+      <div class="hl-hero__drift">
+        {% for f in hero_frames %}
+          <img class="hl-frame" src="{{ f.src }}" alt="{% if forloop.first %}{{ f.alt }}{% endif %}"
+               {% if not forloop.first %}aria-hidden="true"{% endif %}
+               loading="{% if forloop.first %}eager{% else %}lazy{% endif %}"
+               style="object-position: {{ f.ox }}% {{ f.oy }}%; --cycle: {{ f.cycle }}s; --delay: {{ f.delay }}s;">
+        {% endfor %}
+        <div class="hl-hero__hour"></div>
+        <div class="hl-hero__cloud--a"></div>
+        <div class="hl-hero__cloud--b"></div>
+      </div>
+      <div class="hl-hero__scrim"></div>
+    </div>
+
+    <div class="hl-hero__hills" aria-hidden="true">
+      {% for h in hills %}
+        <div class="hl-hill" style="height: {{ h.height }}%; background: {{ h.colour }}; --par: {{ h.parallax }}; --lean-px: {{ h.lean }}px; --sx: {{ h.scale }};"></div>
+      {% endfor %}
+    </div>
+
+    <div class="hl-hero__steam" aria-hidden="true">
+      {% for s in steam %}
+        <div class="hl-steam" style="left: {{ s.x }}px; width: {{ s.w }}px; --dur: {{ s.dur }}s; --delay: {{ s.delay }}s; --off: {{ s.off }};"></div>
+      {% endfor %}
+    </div>
+
+    <div class="hl-hero__type">
+      <div class="hl-eyebrow hl-hero__eyebrow">Ilam · Eastern Nepal · 1,800 m</div>
+      <h1 class="hl-hero__title" id="hl-hero-title">
+        <span style="--delay: 2.9s">Grand</span>
+        <span style="--delay: 3.05s">Cru</span>
+        <span style="--delay: 3.2s">Tea</span>
+        <span class="hl-hero__title-break"></span>
+        <em style="--delay: 3.4s">from</em>
+        <em style="--delay: 3.55s">Nepal</em>
+      </h1>
+      <p class="hl-hero__copy">Four orthodox lots, hand-plucked and single-origin. Offered to importers, tea houses and private-label houses by the chest.</p>
+      <div class="hl-hero__actions">
+        <a class="hl-pill hl-pill--solid" href="{% url 'estate:quote_open' %}"
+           hx-get="{% url 'estate:quote_open' %}" hx-target="#hl-quote" hx-swap="innerHTML">Begin a Quote</a>
+        <a class="hl-pill hl-pill--ghost" href="#collection">The Four Lots</a>
+      </div>
+    </div>
+
+    <div class="hl-cue" aria-hidden="true">
+      <span class="hl-cue__label">Ascend</span>
+      <div class="hl-cue__line"></div>
+    </div>
+
+    <p class="hl-credit hl-hero__credit">Ilam gardens · photos <a href="https://commons.wikimedia.org/wiki/User:Hari_gurung77">Hari gurung77</a>, <a href="https://commons.wikimedia.org/wiki/User:Janak_Bhatta">Janak Bhatta</a> · <a href="https://creativecommons.org/licenses/by-sa/4.0">CC BY-SA 4.0</a></p>
+  </section>
+
+  {# ── estate: an editorial spread over a cloud timelapse ─────────────────── #}
+  <section class="hl-estate" id="estate" aria-labelledby="hl-estate-title">
+    <div class="hl-estate__ghost" aria-hidden="true">ILAM</div>
+    <div class="hl-estate__grid">
+      <div class="hl-estate__text">
+        <div class="hl-estate__kicker">The Estate <span class="hl-rule"></span></div>
+        <h2 class="hl-estate__title" id="hl-estate-title">Grown where the cloud <em>sits all morning</em></h2>
+        <p class="hl-estate__para">Ilam sits on the far eastern ridge of Nepal, on the same soil and the same weather as Darjeeling across the border. Our lots come from smallholder gardens between 1,400 and 2,100 metres, plucked by hand and processed orthodox — rolled, not cut.</p>
+        <p class="hl-estate__para">Altitude slows the bush down. Slower growth is why these leaves carry the aromatics buyers come to Ilam for.</p>
+        <div class="hl-facts">
+          {% for value, key in estate_facts %}
+            <div>
+              <div class="hl-fact__value">{{ value }}</div>
+              <div class="hl-fact__key">{{ key }}</div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="hl-estate__media">
+        <div class="hl-estate__frame">
+          {% for f in estate_frames %}
+            <img class="hl-frame" src="{{ f.src }}" alt="{% if forloop.first %}{{ f.alt }}{% endif %}"
+                 {% if not forloop.first %}aria-hidden="true"{% endif %} loading="lazy"
+                 style="object-position: {{ f.ox }}% {{ f.oy }}%; --cycle: {{ f.cycle }}s; --delay: {{ f.delay }}s;">
+          {% endfor %}
+          <div class="hl-estate__cloud" aria-hidden="true"></div>
+          <div class="hl-estate__cloud--far" aria-hidden="true"></div>
+          <div class="hl-estate__blend" aria-hidden="true"></div>
+          <p class="hl-credit hl-estate__credit">Cloud over the Ilam estates · photos <a href="https://commons.wikimedia.org/wiki/User:Hari_gurung77">Hari gurung77</a>, <a href="https://commons.wikimedia.org/wiki/User:Sandeep_Rut">Sandeep Rut</a>, <a href="https://commons.wikimedia.org/wiki/User:Dikshakattel77">Dikshakattel77</a> · <a href="https://creativecommons.org/licenses/by-sa/4.0">CC BY-SA 4.0</a></p>
+        </div>
+        <div class="hl-estate__marker" aria-hidden="true">Kanyam ridge · 1,800 m <span></span></div>
+      </div>
+    </div>
+  </section>
+
+  {# ── the four lots ──────────────────────────────────────────────────────── #}
+  <section class="hl-collection" id="collection" x-data="hlCollection" aria-labelledby="hl-collection-title">
+    <div class="hl-collection__steep" aria-hidden="true"></div>
+    <div class="hl-collection__inner">
+      <div class="hl-section-head">
+        <h2 class="hl-section-title" id="hl-collection-title">The Four Lots</h2>
+        <p class="hl-lede" style="max-width: 34ch;">Hover a lot and the room takes its colour. Open one for grade, harvest window and available tonnage.</p>
+      </div>
+
+      <div class="hl-lots">
+        {% for tea in teas %}
+          <a class="hl-lot" href="{% url 'estate:lot' tea.slug %}"
+             style="--liquor: {{ tea.liquor }}; --tin: {{ tea.tin }};"
+             @mouseenter="steep('{{ tea.liquor }}', {{ forloop.counter0 }})"
+             @mouseleave="clear()"
+             @focus="steep('{{ tea.liquor }}', {{ forloop.counter0 }})"
+             @blur="clear()"
+             @click="pour('{{ tea.liquor }}')"
+             hx-get="{% url 'estate:lot' tea.slug %}"
+             hx-target="#hl-sheet"
+             hx-swap="innerHTML"
+             hx-push-url="true"
+             hx-trigger="click delay:400ms">
+            <div class="hl-lot__sheen" aria-hidden="true"></div>
+            <div class="hl-lot__body">
+              <div class="hl-lot__meta">
+                <span class="hl-lot__no">Lot {{ tea.lot_number }}</span>
+                <span class="hl-lot__dot" aria-hidden="true"></span>
+              </div>
+              <div class="hl-tin" aria-hidden="true">
+                <div class="hl-tin__lid"></div>
+                <div class="hl-tin__face"><span class="hl-tin__name">{{ tea.name }}</span></div>
+                <div class="hl-tin__base"></div>
+              </div>
+              <div class="hl-lot__foot">
+                <h3 class="hl-lot__name">{{ tea.name }}</h3>
+                <p class="hl-lot__note">{{ tea.note }}</p>
+                <div class="hl-lot__open">Open lot <span aria-hidden="true"></span></div>
+              </div>
+            </div>
+          </a>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+
+  {# ── the ascent: 240 m → 2,100 m on scroll ──────────────────────────────── #}
+  <div class="hl-seam" aria-hidden="true"></div>
+  {{ ascent_lines_data|json_script:"hl-ascent-lines" }}
+  <section class="hl-ascent" id="ascent"
+           x-data="hlAscent('hl-ascent-lines', {{ ascent_base_m }}, {{ ascent_rise_m }})"
+           aria-label="The climb from Ilam bazaar to the ridge">
+    <div class="hl-ascent__stage">
+      <div class="hl-ascent__sky" aria-hidden="true"></div>
+
+      {% for photo in ascent_photos %}
+        <div class="hl-ascent__photo" data-ascent-photo data-at="{{ photo.at }}">
+          <img src="{{ photo.src }}" alt="{{ photo.alt }}" loading="lazy">
+        </div>
+      {% endfor %}
+
+      <div class="hl-ascent__scrim" aria-hidden="true"></div>
+
+      <div class="hl-ascent__ridges" aria-hidden="true">
+        {% for r in ridges %}
+          <div class="hl-ridge" style="height: {{ r.height }}%; background: {{ r.colour }}; border-radius: {{ r.radius }}; --climb: {{ r.climb }}%; --grow: {{ r.grow }}; --lean-px: {{ r.lean }}px;"></div>
+        {% endfor %}
+      </div>
+
+      <div class="hl-ascent__type">
+        <div>
+          <div class="hl-ascent__altitude" x-text="altitude">240</div>
+          <div class="hl-ascent__unit">metres above sea level</div>
+          <h2 class="hl-ascent__line" x-text="line">The road out of Ilam bazaar</h2>
+        </div>
+      </div>
+
+      <p class="hl-credit hl-ascent__credit">Kanyam gardens · photos <a href="https://commons.wikimedia.org/wiki/User:Hari_gurung77">Hari gurung77</a>, <a href="https://creativecommons.org/licenses/by-sa/4.0">CC BY-SA 4.0</a></p>
+
+      <div class="hl-ascent__marks">
+        {% for l in ascent_lines %}
+          <div class="hl-mark" :data-passed="passed({{ l.at }})">
+            <span class="hl-mark__long">{{ l.metres }} m · {{ l.text }}</span>
+            <span class="hl-mark__short">{{ l.metres }}</span>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+
+  {# ── the ritual ─────────────────────────────────────────────────────────── #}
+  <section class="hl-ritual" id="ritual" aria-labelledby="hl-ritual-title">
+    <div class="hl-wrap">
+      <div class="hl-section-head hl-section-head--plain">
+        <h2 class="hl-section-title" id="hl-ritual-title">The Ritual</h2>
+        <p class="hl-lede" style="max-width: 32ch;">Four steps, the way our tasters cup a lot before it leaves the estate.</p>
+      </div>
+      <div class="hl-steps">
+        {% for numeral, title, body, measure in ritual %}
+          <div class="hl-step">
+            <div class="hl-step__numeral">{{ numeral }}</div>
+            <h3 class="hl-step__title">{{ title }}</h3>
+            <p class="hl-step__body">{{ body }}</p>
+            <div class="hl-step__measure">{{ measure }}</div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+
+  {# ── wholesale and private label ────────────────────────────────────────── #}
+  <section class="hl-wholesale" id="wholesale" aria-labelledby="hl-wholesale-title">
+    <div class="hl-wrap">
+      <div class="hl-wholesale__intro">
+        <div class="hl-eyebrow">Wholesale &amp; Private Label</div>
+        <h2 class="hl-wholesale__title" id="hl-wholesale-title">Your name on the tin</h2>
+        <p class="hl-wholesale__copy">We ship loose in 20 kg foil-lined chests, in retail-ready 50 g tins, or in your own packaging under your own label. Minimum first order is 50 kg across any combination of lots.</p>
+      </div>
+      <div class="hl-offers">
+        {% for title, body, minimum in offers %}
+          <div class="hl-offer">
+            <h3 class="hl-offer__title">{{ title }}</h3>
+            <p class="hl-offer__body">{{ body }}</p>
+            <div class="hl-offer__minimum">{{ minimum }}</div>
+          </div>
+        {% endfor %}
+      </div>
+      <div class="hl-invite">
+        <h3 class="hl-invite__title">Tell us what you are pouring</h3>
+        <p class="hl-invite__copy">Seven short questions. We answer with pricing, current lot availability and a sample set within two working days.</p>
+        <a class="hl-pill hl-pill--solid" href="{% url 'estate:quote_open' %}"
+           hx-get="{% url 'estate:quote_open' %}" hx-target="#hl-quote" hx-swap="innerHTML">Begin a Quote</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="hl-footer">
+  <span class="hl-footer__mark">Himalayan Leaf</span>
+  <span class="hl-footer__meta">himalayanleaf.co · @himalayanleaf · Grand Cru Tea from Nepal</span>
+  {% include "estate/partials/photo_credits.html" %}
+</footer>
+
+{# HTMX swaps the lot sheet and the quote ceremony into these. #}
+<div id="hl-sheet">{% if open_lot %}{% include "estate/partials/lot_sheet.html" with tea=open_lot %}{% endif %}</div>
+<div id="hl-quote">{% if open_quote %}{% include "estate/partials/quote_shell.html" %}{% endif %}</div>
+
+{% endblock %}

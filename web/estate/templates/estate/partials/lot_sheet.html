@@ -1,0 +1,78 @@
+{% comment %}
+The lot sheet. Served on its own URL (/lots/<slug>/) so a buyer can link to a lot;
+over HTMX it arrives as this fragment and slides in over the estate.
+{% endcomment %}
+<div class="hl-sheet" style="--liquor: {{ tea.liquor }};" role="dialog" aria-modal="true" aria-label="{{ tea.name }}">
+  <div class="hl-sheet__glow" aria-hidden="true"></div>
+
+  <div class="hl-sheet__inner">
+    <a class="hl-back" href="{% url 'estate:home' %}" data-close
+       @click="pour('{{ tea.liquor }}')"
+       hx-get="{% url 'estate:lot_close' %}"
+       hx-target="#hl-sheet"
+       hx-swap="innerHTML"
+       hx-push-url="{% url 'estate:home' %}"
+       hx-trigger="click delay:400ms"><span aria-hidden="true"></span>Back to the lots</a>
+
+    <div class="hl-sheet__grid">
+      <div class="hl-sheet__object">
+        {# The tin turns with the cursor. #}
+        <div class="hl-tin hl-tin--large" style="--tin: {{ tea.tin }};" aria-hidden="true">
+          <div class="hl-tin__lid"></div>
+          <div class="hl-tin__face">
+            <div class="hl-tin__roundel">HL</div>
+            <span class="hl-tin__house">Himalayan Leaf</span>
+            <span class="hl-tin__lot">{{ tea.name }}</span>
+            <span class="hl-tin__weight">NET WT 50 g</span>
+          </div>
+          <div class="hl-tin__base"></div>
+        </div>
+        <p class="hl-sheet__hint">move your cursor to turn the tin</p>
+
+        {% if tea.leaf_src %}
+          <figure class="hl-sheet__leaf">
+            <div class="hl-sheet__leaf-frame">
+              <img src="{{ tea.leaf_src }}" alt="{{ tea.name }} leaf" loading="lazy">
+            </div>
+            {% if tea.show_leaf_credit %}
+              <figcaption class="hl-credit">
+                {% if tea.leaf_credit_href %}<a href="{{ tea.leaf_credit_href }}">{{ tea.leaf_credit }}</a>
+                {% else %}{{ tea.leaf_credit }}{% endif %}
+              </figcaption>
+            {% endif %}
+          </figure>
+        {% endif %}
+      </div>
+
+      <div>
+        <div class="hl-eyebrow">Lot {{ tea.lot_number }} · Ilam, Nepal</div>
+        <h2 class="hl-sheet__title">{{ tea.name }}</h2>
+        <p class="hl-sheet__note">{{ tea.note }}</p>
+
+        <div class="hl-specs">
+          {% for key, value in tea.specs %}
+            <div class="hl-spec">
+              <div class="hl-spec__key">{{ key }}</div>
+              <div class="hl-spec__value">{{ value }}</div>
+            </div>
+          {% endfor %}
+        </div>
+
+        <div class="hl-sheet__actions">
+          <a class="hl-pill hl-pill--solid" href="{% url 'estate:quote_open' %}?lot={{ tea.slug }}"
+             hx-get="{% url 'estate:quote_open' %}?lot={{ tea.slug }}"
+             hx-target="#hl-quote" hx-swap="innerHTML">Quote this lot</a>
+          {% if next_tea %}
+            <a class="hl-pill hl-pill--ghost" href="{% url 'estate:lot' next_tea.slug %}"
+               @click="pour('{{ next_tea.liquor }}')"
+               hx-get="{% url 'estate:lot' next_tea.slug %}"
+               hx-target="#hl-sheet"
+               hx-swap="innerHTML"
+               hx-push-url="true"
+               hx-trigger="click delay:400ms">Next lot</a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
