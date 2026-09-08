@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Karla:wght@300;400;500&display=swap" rel="stylesheet" />
+<script src="./image-slot.js"></script>
+<style>
+  html, body { margin: 0; padding: 0; background: #0E2018; }
+  * { box-sizing: border-box; }
+  a { color: #C09A4E; text-decoration: none; }
+  a:hover { color: #E3C489; }
+  ::selection { background: #C09A4E; color: #0E2018; }
+  /* the estate slot only exists to override the timelapse — stay invisible until filled */
+  image-slot#hl-estate:not([data-filled]) { opacity: 0; pointer-events: none; }
+  @keyframes hl-steam {
+    0%   { opacity: 0; transform: translate3d(0,40px,0) scaleX(0.7) rotate(0deg); }
+    18%  { opacity: 0.5; }
+    60%  { opacity: 0.32; }
+    100% { opacity: 0; transform: translate3d(var(--dx, 12px),-220px,0) scaleX(1.7) rotate(var(--rot, 8deg)); }
+  }
+  @keyframes hl-drift {
+    0%   { transform: translate3d(0,-8vh,0) rotate(0deg); opacity: 0; }
+    12%  { opacity: 0.55; }
+    88%  { opacity: 0.4; }
+    100% { transform: translate3d(var(--dx, 60px),112vh,0) rotate(var(--spin, 420deg)); opacity: 0; }
+  }
+  @keyframes hl-rise {
+    from { opacity: 0; transform: translateY(26px); }
+    to   { opacity: 1; transform: none; }
+  }
+  @keyframes hl-unfurl {
+    from { opacity: 0; transform: rotate(-14deg) scale(0.82); }
+    to   { opacity: 1; transform: none; }
+  }
+  @keyframes hl-breathe {
+    0%, 100% { transform: scale(1); opacity: 0.55; }
+    50%      { transform: scale(1.06); opacity: 0.8; }
+  }
+  @keyframes hl-pour {
+    from { transform: scaleY(0); }
+    to   { transform: scaleY(1); }
+  }
+  @keyframes hl-word {
+    0%   { opacity: 0; transform: translateY(46px) rotate(-7deg) scale(0.92); filter: blur(9px); }
+    100% { opacity: 1; transform: none; filter: blur(0); }
+  }
+  @keyframes hl-fill {
+    from { transform: scaleY(0); }
+    to   { transform: scaleY(1); }
+  }
+  @keyframes hl-veil {
+    0%   { transform: translateY(0); }
+    62%  { transform: translateY(0); }
+    100% { transform: translateY(-102%); }
+  }
+  @keyframes hl-veil-in {
+    0%   { transform: translateY(-102%); }
+    46%  { transform: translateY(0); }
+    54%  { transform: translateY(0); }
+    100% { transform: translateY(102%); }
+  }
+  @keyframes hl-ripple {
+    from { opacity: 0.55; transform: translate(-50%,-50%) scale(0.2); }
+    to   { opacity: 0; transform: translate(-50%,-50%) scale(4.2); }
+  }
+  @keyframes hl-spin-slow {
+    to { transform: rotate(360deg); }
+  }
+  @keyframes hl-fade {
+    to { opacity: 0; visibility: hidden; }
+  }
+  @keyframes hl-timelapse {
+    0%    { opacity: 0; transform: scale(1.10); }
+    2.5%  { opacity: 1; }
+    25%   { opacity: 1; transform: scale(1.19); }
+    27.5% { opacity: 0; transform: scale(1.2); }
+    100%  { opacity: 0; transform: scale(1.10); }
+  }
+  @keyframes hl-cloud-a {
+    0%   { transform: translate3d(-140px, 0, 0); }
+    100% { transform: translate3d(140px, 18px, 0); }
+  }
+  @keyframes hl-cloud-b {
+    0%   { transform: translate3d(150px, 10px, 0); }
+    100% { transform: translate3d(-150px, -8px, 0); }
+  }
+  @keyframes hl-wisp {
+    0%   { opacity: 0; transform: translate3d(0, 8px, 0) scaleX(0.6) rotate(0deg); }
+    20%  { opacity: 0.75; }
+    70%  { opacity: 0.4; }
+    100% { opacity: 0; transform: translate3d(var(--wx, 10px), -74px, 0) scaleX(1.6) rotate(var(--wr, 10deg)); }
+  }
+  @keyframes hl-hour {
+    0%, 100% { opacity: 0.28; }
+    30%      { opacity: 0.95; }
+    62%      { opacity: 0.5; }
+  }
+</style>
+</helmet>
+
+<div style="position: relative; background: #0E2018; color: #F4EFE4; font-family: Karla, system-ui, sans-serif; overflow-x: clip;">
+
+  <sc-if value="{{ intro }}" hint-placeholder-val="{{ true }}">
+    <div style="position: fixed; inset: 0; z-index: 90; background: #08150F; display: grid; place-items: center; animation: hl-fade .9s 2.7s forwards;">
+      <div style="position: absolute; inset: 0; overflow: hidden;">
+        <div style="position: absolute; left: 0; right: 0; bottom: 0; height: 100%; transform-origin: bottom; animation: hl-fill 2.5s cubic-bezier(.5,0,.2,1) both; background: linear-gradient(180deg, rgba(201,143,46,0) 0%, rgba(201,143,46,0.16) 40%, rgba(142,42,32,0.36) 100%);"></div>
+      </div>
+      <div style="position: absolute; left: 50%; bottom: 0; width: 260px; height: 60vh; transform: translateX(-50%); opacity: 0.8;">
+        <sc-for list="{{ steam }}" as="s" hint-placeholder-count="0">
+          <div style="{{ s.style }}"></div>
+        </sc-for>
+      </div>
+      <div style="position: relative; text-align: center;">
+        <div style="position: relative; width: 132px; height: 158px; margin: 0 auto;">
+          <div style="position: absolute; left: 50%; bottom: 74px; width: 90px; height: 84px; transform: translateX(-50%);">
+            <div style="position: absolute; left: 14px; bottom: 0; width: 9px; height: 62px; border-radius: 50%; filter: blur(7px); background: linear-gradient(180deg, rgba(244,239,228,0) 0%, rgba(244,239,228,0.6) 46%, rgba(244,239,228,0) 100%); animation: hl-wisp 3.4s 0s ease-out infinite; --wx: -14px; --wr: -12deg;"></div>
+            <div style="position: absolute; left: 40px; bottom: 0; width: 11px; height: 74px; border-radius: 50%; filter: blur(8px); background: linear-gradient(180deg, rgba(244,239,228,0) 0%, rgba(244,239,228,0.7) 44%, rgba(244,239,228,0) 100%); animation: hl-wisp 3.9s 0.5s ease-out infinite; --wx: 8px; --wr: 8deg;"></div>
+            <div style="position: absolute; left: 64px; bottom: 0; width: 8px; height: 58px; border-radius: 50%; filter: blur(7px); background: linear-gradient(180deg, rgba(244,239,228,0) 0%, rgba(244,239,228,0.55) 48%, rgba(244,239,228,0) 100%); animation: hl-wisp 3.1s 1.1s ease-out infinite; --wx: 18px; --wr: 16deg;"></div>
+          </div>
+          <div style="position: absolute; left: 50%; bottom: 22px; width: 92px; height: 58px; transform: translateX(-50%);">
+            <div style="position: absolute; right: -22px; top: 12px; width: 26px; height: 26px; border: 1px solid rgba(192,154,78,0.55); border-left-color: transparent; border-radius: 50%;"></div>
+            <div style="position: absolute; inset: 0; overflow: hidden; border: 1px solid rgba(192,154,78,0.7); border-top-color: rgba(192,154,78,0.9); border-radius: 4px 4px 44% 44%; background: rgba(244,239,228,0.03);">
+              <div style="position: absolute; left: 0; right: 0; bottom: 0; height: 84%; transform-origin: bottom; animation: hl-fill 2.4s cubic-bezier(.5,0,.2,1) both; background: linear-gradient(180deg, #C98F2E 0%, #A8621F 62%, #7A3A14 100%);"></div>
+              <div style="position: absolute; left: 0; right: 0; top: 0; height: 7px; background: linear-gradient(180deg, rgba(244,239,228,0.22), transparent);"></div>
+            </div>
+          </div>
+          <div style="position: absolute; left: 50%; bottom: 10px; width: 132px; height: 10px; transform: translateX(-50%); border: 1px solid rgba(192,154,78,0.35); border-top: none; border-radius: 0 0 50% 50%;"></div>
+        </div>
+        <div style="font-family: 'EB Garamond', Georgia, serif; font-size: clamp(22px, 3vw, 34px); letter-spacing: 0.34em; text-transform: uppercase; white-space: nowrap; color: #F4EFE4; margin-top: 34px; animation: hl-rise 1.1s .2s both;">Himalayan Leaf</div>
+        <div style="font-family: ui-monospace, monospace; font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase; color: rgba(192,154,78,0.85); margin-top: 16px; animation: hl-rise 1.1s .5s both;">steeping · {{ introLabel }}</div>
+      </div>
+    </div>
+  </sc-if>
+
+  <div style="{{ cursorStyle }}"></div>
+  <div style="position: fixed; inset: 0; pointer-events: none; z-index: 79; overflow: hidden;">
+    <sc-for list="{{ ripples }}" as="r" hint-placeholder-count="0">
+      <div style="{{ r.style }}"></div>
+    </sc-for>
+  </div>
+
+  <sc-if value="{{ pouring }}" hint-placeholder-val="{{ false }}">
+    <div style="position: fixed; inset: 0; z-index: 70; pointer-events: none; overflow: hidden;">
+      <div style="{{ veilStyle }}"></div>
+    </div>
+  </sc-if>
+
+  <div style="position: fixed; inset: 0; pointer-events: none; z-index: 3; mix-blend-mode: screen; opacity: 0.5;">
+    <sc-for list="{{ drift }}" as="d" hint-placeholder-count="0">
+      <div style="{{ d.style }}"></div>
+    </sc-for>
+  </div>
+
+  <header style="position: fixed; top: 0; left: 0; right: 0; z-index: 20; display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap; padding: 20px clamp(20px, 5vw, 64px); backdrop-filter: blur(14px); background: linear-gradient(180deg, rgba(14,32,24,0.82), rgba(14,32,24,0));">
+    <div onClick="{{ goHome }}" style="display: flex; align-items: baseline; gap: 12px; cursor: pointer;">
+      <span style="font-family: 'EB Garamond', Georgia, serif; font-size: 22px; letter-spacing: 0.34em; text-transform: uppercase; white-space: nowrap; color: #F4EFE4;">Himalayan Leaf</span>
+      <span style="font-size: 9px; letter-spacing: 0.3em; text-transform: uppercase; color: rgba(244,239,228,0.45); display: none;">Nepal</span>
+    </div>
+    <nav style="display: flex; align-items: center; flex-wrap: wrap; justify-content: flex-end; gap: clamp(10px, 2vw, 34px);">
+      <sc-for list="{{ navItems }}" as="n" hint-placeholder-count="4">
+        <div onClick="{{ n.go }}" style="font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase; white-space: nowrap; color: rgba(244,239,228,0.6); cursor: pointer; transition: color 0.4s;" style-hover="color: #C09A4E;">{{ n.label }}</div>
+      </sc-for>
+      <div onClick="{{ openQuote }}" style="font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: #0E2018; background: #C09A4E; padding: 11px 18px; flex: 0 0 auto; border-radius: 999px; white-space: nowrap; cursor: pointer; transition: transform 0.4s, background 0.4s;" style-hover="background: #E3C489; transform: translateY(-2px);">Request a Quote</div>
+    </nav>
+  </header>
+
+  <section data-screen-label="Hero" style="position: relative; min-height: 100vh; display: grid; place-items: center; padding: 132px clamp(20px, 5vw, 64px) 150px; text-align: center; overflow: hidden;">
+    <div style="position: absolute; inset: 0; background: radial-gradient(120% 90% at 50% 8%, #1B3A2C 0%, #0E2018 58%, #08150F 100%);"></div>
+    <div style="position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 1;">
+      <div style="{{ tlDriftStyle }}">
+        <sc-for list="{{ timelapse }}" as="t" hint-placeholder-count="4">
+          <img src="{{ t.src }}" alt="{{ t.alt }}" style="{{ t.style }}" />
+        </sc-for>
+        <div style="position: absolute; inset: 0; mix-blend-mode: soft-light; background: linear-gradient(205deg, rgba(224,169,86,0.5) 0%, rgba(28,74,58,0.2) 55%, rgba(10,24,34,0.34) 100%); animation: hl-hour 36s linear infinite;"></div>
+        <div style="position: absolute; left: -30%; right: -30%; top: 8%; height: 44%; opacity: 0.55; filter: blur(28px); background: radial-gradient(60% 100% at 30% 50%, rgba(244,239,228,0.3), transparent 72%), radial-gradient(50% 90% at 74% 44%, rgba(244,239,228,0.22), transparent 74%); animation: hl-cloud-a 44s ease-in-out infinite alternate;"></div>
+        <div style="position: absolute; left: -30%; right: -30%; top: 34%; height: 40%; opacity: 0.4; filter: blur(38px); background: radial-gradient(70% 100% at 62% 50%, rgba(244,239,228,0.24), transparent 76%); animation: hl-cloud-b 58s ease-in-out infinite alternate;"></div>
+      </div>
+      <div style="position: absolute; inset: 0; background: linear-gradient(180deg, rgba(8,21,15,0.62) 0%, rgba(14,32,24,0.34) 34%, rgba(14,32,24,0.5) 62%, #0E2018 100%);"></div>
+    </div>
+    <div style="position: absolute; left: 0; right: 0; bottom: 0; height: 62vh; pointer-events: none;">
+      <sc-for list="{{ hills }}" as="h" hint-placeholder-count="4">
+        <div style="{{ h.style }}"></div>
+      </sc-for>
+    </div>
+    <div style="position: absolute; left: 50%; bottom: 0; width: min(620px, 82vw); height: 78vh; transform: translateX(-50%); pointer-events: none; z-index: 3; opacity: 0.85;">
+      <sc-for list="{{ steam }}" as="s" hint-placeholder-count="0">
+        <div style="{{ s.style }}"></div>
+      </sc-for>
+    </div>
+
+    <div style="position: relative; z-index: 4; max-width: 900px;">
+      <div style="font-size: 10px; letter-spacing: 0.42em; text-transform: uppercase; color: #C09A4E; animation: hl-rise 1.2s 2.75s both;">Ilam · Eastern Nepal · 1,800 m</div>
+      <h1 style="font-family: 'EB Garamond', Georgia, serif; font-weight: 300; font-size: clamp(46px, 9vw, 132px); line-height: 0.94; letter-spacing: -0.02em; margin: 26px 0 0; display: flex; flex-wrap: wrap; gap: 0 0.28em; justify-content: center;">
+        <span style="display: inline-block; animation: hl-word 1.5s 2.9s cubic-bezier(.16,1,.3,1) both;">Grand</span>
+        <span style="display: inline-block; animation: hl-word 1.5s 3.05s cubic-bezier(.16,1,.3,1) both;">Cru</span>
+        <span style="display: inline-block; animation: hl-word 1.5s 3.2s cubic-bezier(.16,1,.3,1) both;">Tea</span>
+        <span style="flex-basis: 100%; height: 0;"></span>
+        <em style="display: inline-block; font-style: italic; color: #C09A4E; animation: hl-word 1.6s 3.4s cubic-bezier(.16,1,.3,1) both;">from</em>
+        <em style="display: inline-block; font-style: italic; color: #C09A4E; animation: hl-word 1.6s 3.55s cubic-bezier(.16,1,.3,1) both;">Nepal</em>
+      </h1>
+      <p style="max-width: 46ch; margin: 30px auto 0; font-size: clamp(15px, 1.4vw, 18px); line-height: 1.7; color: rgba(244,239,228,0.68); font-weight: 300; animation: hl-rise 1.4s 3.75s both;">Four orthodox lots, hand-plucked and single-origin. Offered to importers, tea houses and private-label houses by the chest.</p>
+      <div style="display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; margin-top: 42px; animation: hl-rise 1.4s 4s both;">
+        <div onClick="{{ openQuote }}" style="font-size: 11px; letter-spacing: 0.24em; text-transform: uppercase; color: #0E2018; background: #C09A4E; padding: 17px 34px; border-radius: 999px; white-space: nowrap; cursor: pointer; transition: transform 0.5s, background 0.5s;" style-hover="background: #E3C489; transform: translateY(-3px);">Begin a Quote</div>
+        <div onClick="{{ goCollection }}" style="font-size: 11px; letter-spacing: 0.24em; text-transform: uppercase; color: rgba(244,239,228,0.8); border: 1px solid rgba(244,239,228,0.24); padding: 17px 34px; border-radius: 999px; white-space: nowrap; cursor: pointer; transition: border-color 0.5s, color 0.5s;" style-hover="border-color: #C09A4E; color: #C09A4E;">The Four Lots</div>
+      </div>
+    </div>
+
+    <sc-if value="{{ showCue }}" hint-placeholder-val="{{ true }}">
+      <div style="position: absolute; bottom: 26px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 10px; z-index: 4;">
+        <span style="font-size: 9px; letter-spacing: 0.3em; text-transform: uppercase; color: rgba(244,239,228,0.4);">Ascend</span>
+        <div style="width: 1px; height: 40px; background: linear-gradient(180deg, rgba(192,154,78,0.9), transparent); animation: hl-breathe 3.4s ease-in-out infinite;"></div>
+      </div>
+    </sc-if>
+  </section>
+
+  <section id="estate" data-screen-label="Estate" style="position: relative; overflow: hidden; padding: clamp(90px, 14vh, 170px) 0 clamp(90px, 14vh, 170px); background: linear-gradient(180deg, #0E2018 0%, #0B1C15 62%, #0A1912 100%);">
+    <div style="{{ estateGhostStyle }}">ILAM</div>
+    <div style="position: relative; max-width: 1440px; margin: 0 auto; padding-left: clamp(20px, 5vw, 64px); display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: clamp(38px, 5vw, 76px); align-items: center;">
+      <div style="position: relative; z-index: 2;">
+        <div style="display: flex; align-items: center; gap: 14px; font-size: 10px; letter-spacing: 0.42em; text-transform: uppercase; color: #C09A4E;">The Estate <span style="display: inline-block; width: 42px; height: 1px; background: rgba(192,154,78,0.5);"></span></div>
+        <h2 style="font-family: 'EB Garamond', Georgia, serif; font-weight: 400; font-size: clamp(38px, 5.6vw, 76px); line-height: 1.02; margin: 24px 0 0; text-wrap: pretty;">Grown where the cloud <em style="font-style: italic; color: #C09A4E;">sits all morning</em></h2>
+        <p style="max-width: 44ch; font-size: 15.5px; line-height: 1.9; color: rgba(244,239,228,0.68); font-weight: 300; margin: 30px 0 0;">Ilam sits on the far eastern ridge of Nepal, on the same soil and the same weather as Darjeeling across the border. Our lots come from smallholder gardens between 1,400 and 2,100 metres, plucked by hand and processed orthodox — rolled, not cut.</p>
+        <p style="max-width: 44ch; font-size: 15.5px; line-height: 1.9; color: rgba(244,239,228,0.68); font-weight: 300; margin: 18px 0 0;">Altitude slows the bush down. Slower growth is why these leaves carry the aromatics buyers come to Ilam for.</p>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 26px 20px; margin-top: 44px; border-top: 1px solid rgba(244,239,228,0.14); padding-top: 30px;">
+          <sc-for list="{{ facts }}" as="f" hint-placeholder-count="3">
+            <div>
+              <div style="font-family: 'EB Garamond', Georgia, serif; font-size: clamp(28px, 2.4vw, 38px); color: #C09A4E; line-height: 1.05; text-wrap: balance;">{{ f.v }}</div>
+              <div style="font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; color: rgba(244,239,228,0.5); margin-top: 9px;">{{ f.k }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="position: relative; min-width: 0;">
+        <div style="{{ estateFrameStyle }}">
+          <sc-for list="{{ estateFrames }}" as="e" hint-placeholder-count="4">
+            <img src="{{ e.src }}" alt="{{ e.alt }}" style="{{ e.style }}" />
+          </sc-for>
+          <div style="position: absolute; inset: 0; z-index: 2;">
+            <image-slot id="hl-estate" style="filter: saturate(0.62) contrast(0.96) brightness(0.78)" shape="rect" fit="cover" placeholder="Drop the client's own estate photo to replace this timelapse"></image-slot>
+          </div>
+          <div style="{{ estateCloudStyle }}"></div>
+          <div style="position: absolute; left: -20%; right: -20%; top: 12%; height: 46%; pointer-events: none; opacity: 0.42; filter: blur(34px); background: radial-gradient(66% 100% at 58% 50%, rgba(244,239,228,0.3), transparent 76%); animation: hl-cloud-b 64s ease-in-out infinite alternate;"></div>
+          <div style="position: absolute; inset: 0; pointer-events: none; background: linear-gradient(90deg, #0B1C15 0%, rgba(11,28,21,0.35) 22%, rgba(11,28,21,0) 55%);"></div>
+          <div style="position: absolute; left: 0; right: calc(14px + clamp(20px, 5vw, 64px)); bottom: 0; z-index: 3; padding: 16px 16px 12px; background: linear-gradient(180deg, rgba(8,21,15,0) 0%, rgba(8,21,15,0.9) 14px, rgba(8,21,15,0.92) 100%); font-family: ui-monospace, monospace; font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: #F4EFE4; line-height: 1.8;">Cloud over the Ilam estates · photos <a href="https://commons.wikimedia.org/wiki/User:Hari_gurung77">Hari gurung77</a>, <a href="https://commons.wikimedia.org/wiki/User:Sandeep_Rut">Sandeep Rut</a>, <a href="https://commons.wikimedia.org/wiki/User:Dikshakattel77">Dikshakattel77</a> · <a href="https://creativecommons.org/licenses/by-sa/4.0">CC BY-SA 4.0</a></div>
+        </div>
+        <div style="position: absolute; left: -14px; top: 0; display: flex; align-items: center; gap: 12px; writing-mode: vertical-rl; font-size: 9px; letter-spacing: 0.34em; text-transform: uppercase; color: rgba(244,239,228,0.68);">Kanyam ridge · 1,800 m <span style="display: inline-block; width: 1px; height: 60px; background: rgba(192,154,78,0.6);"></span></div>
+      </div>
+    </div>
+  </section>
+
+
+  <section id="collection" data-screen-label="Collection" style="position: relative; background: linear-gradient(180deg, #0A1912 0%, #0E2018 20%, #0E2018 100%); padding: clamp(80px, 12vh, 150px) clamp(20px, 5vw, 64px) clamp(90px, 14vh, 170px);">
+    <div style="{{ steepStyle }}"></div>
+    <div style="position: relative; max-width: 1240px; margin: 0 auto;">
+      <div style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 24px; border-bottom: 1px solid rgba(244,239,228,0.14); padding-bottom: 28px;">
+        <h2 style="font-family: 'EB Garamond', Georgia, serif; font-weight: 300; font-size: clamp(34px, 5vw, 68px); line-height: 1; margin: 0;">The Four Lots</h2>
+        <p style="max-width: 34ch; margin: 0; font-size: 14px; line-height: 1.75; color: rgba(244,239,228,0.6); font-weight: 300;">Hover a lot and the room takes its colour. Open one for grade, harvest window and available tonnage.</p>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: clamp(14px, 2vw, 26px); margin-top: clamp(34px, 5vh, 60px);">
+        <sc-for list="{{ teas }}" as="t" hint-placeholder-count="4">
+          <div onClick="{{ t.open }}" onMouseEnter="{{ t.hover }}" onMouseLeave="{{ leave }}" style="{{ t.cardStyle }}">
+            <div style="position: absolute; inset: 0; opacity: 0.5; background: radial-gradient(90% 70% at 50% 108%, rgba(255,255,255,0.16), transparent 70%);"></div>
+            <div style="position: relative; display: flex; flex-direction: column; height: 100%; gap: 22px;">
+              <div style="display: flex; align-items: center; justify-content: space-between;">
+                <span style="font-size: 9px; letter-spacing: 0.3em; text-transform: uppercase; color: rgba(244,239,228,0.42);">Lot {{ t.no }}</span>
+                <span style="{{ t.dotStyle }}"></span>
+              </div>
+              <div style="{{ t.tinStyle }}">
+                <div style="width: 100%; height: 13px; border-radius: 4px 4px 2px 2px; background: linear-gradient(180deg, rgba(255,255,255,0.55), rgba(255,255,255,0.12));"></div>
+                <div style="flex: 1; display: grid; place-items: center; padding: 10px;">
+                  <span style="font-family: 'EB Garamond', Georgia, serif; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; text-align: center; color: rgba(255,255,255,0.9); text-shadow: 0 1px 6px rgba(0,0,0,0.5);">{{ t.name }}</span>
+                </div>
+                <div style="width: 100%; height: 8px; border-radius: 0 0 4px 4px; background: rgba(192,154,78,0.7);"></div>
+              </div>
+              <div style="margin-top: auto;">
+                <h3 style="font-family: 'EB Garamond', Georgia, serif; font-weight: 400; font-size: 27px; line-height: 1.1; margin: 0 0 8px;">{{ t.name }}</h3>
+                <p style="margin: 0; font-size: 12.5px; line-height: 1.7; color: rgba(244,239,228,0.62); font-weight: 300;">{{ t.note }}</p>
+                <div style="display: flex; align-items: center; gap: 9px; margin-top: 18px; font-size: 10px; letter-spacing: 0.24em; text-transform: uppercase; color: #C09A4E;">Open lot <span style="display: inline-block; width: 22px; height: 1px; background: #C09A4E;"></span></div>
+              </div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <div style="position: relative; height: 0; overflow: visible; z-index: 5;"><div style="position: absolute; left: 0; right: 0; top: -18vh; height: 36vh; pointer-events: none; background: linear-gradient(180deg, rgba(14,32,24,0) 0%, #0E2018 48%, rgba(14,32,24,0) 100%);"></div></div>
+  <section id="ascent" data-screen-label="Ascent" style="{{ ascentSectionStyle }}">
+    <div style="position: sticky; top: 0; height: 100vh; overflow: hidden;">
+      <div style="{{ ascentSkyStyle }}"></div>
+      <sc-for list="{{ ascentPhotos }}" as="a" hint-placeholder-count="3">
+        <div style="{{ a.style }}">
+          <image-slot id="{{ a.id }}" shape="rect" fit="cover" placeholder="{{ a.ph }}" src="{{ a.src }}"></image-slot>
+        </div>
+      </sc-for>
+      <div style="position: absolute; inset: 0; pointer-events: none; z-index: 1; background: linear-gradient(180deg, #0E2018 0%, rgba(14,32,24,0.5) 26%, rgba(14,32,24,0.28) 55%, rgba(10,25,18,0.85) 88%, #0A1912 100%);"></div>
+      <div style="position: absolute; inset: 0; pointer-events: none; z-index: 2;">
+        <sc-for list="{{ ridges }}" as="r" hint-placeholder-count="5">
+          <div style="{{ r.style }}"></div>
+        </sc-for>
+      </div>
+      <div style="position: absolute; inset: 0; display: grid; place-items: center; text-align: center; padding: 12vh clamp(20px, 5vw, 64px) 18vh;">
+        <div style="max-width: 720px;">
+          <div style="{{ altStyle }}">{{ altitude }}</div>
+          <div style="font-size: 10px; letter-spacing: 0.4em; text-transform: uppercase; color: rgba(244,239,228,0.55); margin-top: 12px;">metres above sea level</div>
+          <h2 style="{{ ascentLineStyle }}">{{ ascentLine }}</h2>
+        </div>
+      </div>
+      <div style="position: absolute; left: clamp(20px, 5vw, 64px); bottom: 16px; z-index: 5; font-family: ui-monospace, monospace; font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(244,239,228,0.34); line-height: 1.7;">Kanyam gardens · photos <a href="https://commons.wikimedia.org/wiki/User:Hari_gurung77">Hari gurung77</a>, <a href="https://creativecommons.org/licenses/by-sa/4.0">CC BY-SA 4.0</a></div>
+      <div style="{{ ascentMarksStyle }}">
+        <sc-for list="{{ ascentMarks }}" as="m" hint-placeholder-count="4">
+          <div style="{{ m.style }}">{{ m.label }}</div>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <section id="ritual" data-screen-label="Ritual" style="position: relative; padding: clamp(80px, 12vh, 150px) clamp(20px, 5vw, 64px); background: #0A1912; overflow: hidden;">
+    <div style="max-width: 1240px; margin: 0 auto;">
+      <div style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 20px;">
+        <h2 style="font-family: 'EB Garamond', Georgia, serif; font-weight: 300; font-size: clamp(34px, 5vw, 64px); line-height: 1; margin: 0;">The Ritual</h2>
+        <p style="max-width: 32ch; margin: 0; font-size: 14px; line-height: 1.75; color: rgba(244,239,228,0.6); font-weight: 300;">Four steps, the way our tasters cup a lot before it leaves the estate.</p>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: clamp(16px, 2.4vw, 30px); margin-top: clamp(34px, 5vh, 60px);">
+        <sc-for list="{{ ritual }}" as="r" hint-placeholder-count="4">
+          <div style="position: relative; padding: 30px 24px 34px; border-top: 1px solid rgba(192,154,78,0.4);">
+            <div style="position: absolute; top: -1px; left: 0; width: 34px; height: 2px; background: #C09A4E; animation: hl-pour 1.4s both; transform-origin: left;"></div>
+            <div style="font-family: 'EB Garamond', Georgia, serif; font-size: 15px; color: #C09A4E; letter-spacing: 0.2em;">{{ r.n }}</div>
+            <h3 style="font-family: 'EB Garamond', Georgia, serif; font-weight: 400; font-size: 25px; margin: 14px 0 10px;">{{ r.t }}</h3>
+            <p style="margin: 0; font-size: 13px; line-height: 1.8; color: rgba(244,239,228,0.6); font-weight: 300;">{{ r.d }}</p>
+            <div style="margin-top: 20px; font-size: 10px; letter-spacing: 0.24em; text-transform: uppercase; color: rgba(244,239,228,0.42);">{{ r.m }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <section id="wholesale" data-screen-label="Private label" style="position: relative; padding: clamp(80px, 12vh, 150px) clamp(20px, 5vw, 64px) clamp(100px, 15vh, 180px); background: linear-gradient(180deg, #0A1912, #0E2018);">
+    <div style="max-width: 1240px; margin: 0 auto;">
+      <div style="max-width: 640px;">
+        <div style="font-size: 10px; letter-spacing: 0.42em; text-transform: uppercase; color: #C09A4E;">Wholesale &amp; Private Label</div>
+        <h2 style="font-family: 'EB Garamond', Georgia, serif; font-weight: 300; font-size: clamp(34px, 5vw, 64px); line-height: 1.02; margin: 22px 0 0;">Your name on the tin</h2>
+        <p style="font-size: 15px; line-height: 1.85; color: rgba(244,239,228,0.66); font-weight: 300; margin: 24px 0 0;">We ship loose in 20 kg foil-lined chests, in retail-ready 50 g tins, or in your own packaging under your own label. Minimum first order is 50 kg across any combination of lots.</p>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: clamp(16px, 2.4vw, 26px); margin-top: clamp(36px, 5vh, 62px);">
+        <sc-for list="{{ offers }}" as="o" hint-placeholder-count="3">
+          <div style="padding: 30px 26px 34px; border: 1px solid rgba(244,239,228,0.12); border-radius: 3px; background: rgba(244,239,228,0.025); transition: border-color .7s, transform .7s;" style-hover="border-color: rgba(192,154,78,0.5); transform: translateY(-6px);">
+            <h3 style="font-family: 'EB Garamond', Georgia, serif; font-weight: 400; font-size: 26px; margin: 0 0 12px;">{{ o.t }}</h3>
+            <p style="margin: 0; font-size: 13px; line-height: 1.8; color: rgba(244,239,228,0.62); font-weight: 300;">{{ o.d }}</p>
+            <div style="margin-top: 22px; padding-top: 16px; border-top: 1px solid rgba(244,239,228,0.1); font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: #C09A4E;">{{ o.m }}</div>
+          </div>
+        </sc-for>
+      </div>
+      <div style="margin-top: clamp(48px, 8vh, 90px); padding: clamp(36px, 6vw, 70px); border: 1px solid rgba(192,154,78,0.3); border-radius: 3px; background: radial-gradient(120% 140% at 0% 0%, rgba(192,154,78,0.12), rgba(244,239,228,0.02)); text-align: center;">
+        <h3 style="font-family: 'EB Garamond', Georgia, serif; font-weight: 300; font-size: clamp(28px, 4vw, 52px); line-height: 1.1; margin: 0;">Tell us what you are pouring</h3>
+        <p style="max-width: 44ch; margin: 20px auto 0; font-size: 14.5px; line-height: 1.8; color: rgba(244,239,228,0.66); font-weight: 300;">Seven short questions. We answer with pricing, current lot availability and a sample set within two working days.</p>
+        <div onClick="{{ openQuote }}" style="display: inline-block; margin-top: 34px; font-size: 11px; letter-spacing: 0.24em; text-transform: uppercase; color: #0E2018; background: #C09A4E; padding: 18px 40px; border-radius: 999px; white-space: nowrap; cursor: pointer; transition: transform .5s, background .5s;" style-hover="background: #E3C489; transform: translateY(-3px);">Begin a Quote</div>
+      </div>
+    </div>
+  </section>
+
+  <footer style="position: relative; padding: 54px clamp(20px, 5vw, 64px); border-top: 1px solid rgba(244,239,228,0.12); display: flex; flex-wrap: wrap; gap: 18px; align-items: center; justify-content: space-between; background: #0E2018;">
+    <span style="font-family: 'EB Garamond', Georgia, serif; font-size: 16px; letter-spacing: 0.3em; text-transform: uppercase; color: rgba(244,239,228,0.75);">Himalayan Leaf</span>
+    <span style="font-size: 11px; letter-spacing: 0.16em; color: rgba(244,239,228,0.45);">himalayanleaf.co · @himalayanleaf · Grand Cru Tea from Nepal</span>
+    <div style="flex-basis: 100%; font-family: ui-monospace, monospace; font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(244,239,228,0.4); margin-top: 10px; line-height: 1.7; margin-top: 14px;">Photography (temporary stand-ins, via Wikimedia Commons under <a href="https://creativecommons.org/licenses/by-sa/4.0">CC BY-SA 4.0</a>): <a href="https://commons.wikimedia.org/wiki/File:Kanyam_ilam,nepal.jpg">Kanyam Ilam Nepal</a>, <a href="https://commons.wikimedia.org/wiki/File:Tea_garden_kanyam_ilam_Nepal.jpg">Tea garden Kanyam</a>, <a href="https://commons.wikimedia.org/wiki/File:Kanyam_hills_of_Queen,ilam_9.jpg">Kanyam hills of Queen</a>, <a href="https://commons.wikimedia.org/wiki/File:Beautiful_garden_ilam.jpg">Beautiful garden Ilam</a>, <a href="https://commons.wikimedia.org/wiki/File:Tea_garden_views.jpg">Tea garden views</a>, <a href="https://commons.wikimedia.org/wiki/File:An_evening_at_tea_garden_of_kanyam.jpg">An evening at tea garden of Kanyam</a> and <a href="https://commons.wikimedia.org/wiki/File:Ilam_green.jpg">Ilam green</a> by <a href="https://commons.wikimedia.org/wiki/User:Hari_gurung77">Hari gurung77</a>; <a href="https://commons.wikimedia.org/wiki/File:Evening_and_cloud.jpg">Evening and cloud</a> by <a href="https://commons.wikimedia.org/wiki/User:Hari_gurung77">Hari gurung77</a>; <a href="https://commons.wikimedia.org/wiki/File:Kanyam_Ilam.jpg">Kanyam Ilam</a> by <a href="https://commons.wikimedia.org/wiki/User:Janak_Bhatta">Janak Bhatta</a>; <a href="https://commons.wikimedia.org/wiki/File:Kanyam_in_Clouds.jpg">Kanyam in Clouds</a> by <a href="https://commons.wikimedia.org/wiki/User:Sandeep_Rut">Sandeep Rut</a>; <a href="https://commons.wikimedia.org/wiki/File:Mist_vally_tea_industry.jpg">Mist valley tea industry</a> by <a href="https://commons.wikimedia.org/wiki/User:Dikshakattel77">Dikshakattel77</a>.</div>
+  </footer>
+
+  <sc-if value="{{ showTea }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="Tea detail" style="{{ sheetStyle }}">
+      <div style="position: absolute; inset: 0; background: radial-gradient(90% 80% at 22% 40%, {{ detailGlow }}, rgba(8,21,15,0) 70%); pointer-events: none;"></div>
+      <div style="position: relative; max-width: 1180px; margin: 0 auto; padding: clamp(70px, 10vh, 120px) clamp(20px, 5vw, 64px) clamp(60px, 9vh, 110px);">
+        <div onClick="{{ closeTea }}" style="display: inline-flex; align-items: center; gap: 12px; font-size: 10px; letter-spacing: 0.26em; text-transform: uppercase; color: rgba(244,239,228,0.6); cursor: pointer; transition: color .5s;" style-hover="color: #C09A4E;"><span style="display: inline-block; width: 26px; height: 1px; background: currentColor;"></span>Back to the lots</div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: clamp(34px, 5vw, 80px); align-items: center; margin-top: clamp(30px, 5vh, 56px);">
+          <div style="display: grid; place-items: center; min-height: 380px; perspective: 1100px;">
+            <div style="{{ bigTinStyle }}">
+              <div style="width: 100%; height: 26px; border-radius: 8px 8px 3px 3px; background: linear-gradient(180deg, rgba(255,255,255,0.6), rgba(255,255,255,0.14));"></div>
+              <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 18px;">
+                <div style="width: 46px; height: 46px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.55); display: grid; place-items: center; font-family: 'EB Garamond', Georgia, serif; font-size: 13px; color: rgba(255,255,255,0.85);">HL</div>
+                <span style="font-family: 'EB Garamond', Georgia, serif; font-size: 13px; letter-spacing: 0.28em; text-transform: uppercase; color: rgba(255,255,255,0.92); text-align: center; text-shadow: 0 1px 8px rgba(0,0,0,0.6);">Himalayan Leaf</span>
+                <span style="font-family: 'EB Garamond', Georgia, serif; font-size: 16px; letter-spacing: 0.16em; text-transform: uppercase; color: #fff; text-align: center;">{{ detail.name }}</span>
+                <span style="font-size: 9px; letter-spacing: 0.2em; color: rgba(255,255,255,0.6);">NET WT 50 g</span>
+              </div>
+              <div style="width: 100%; height: 16px; border-radius: 0 0 6px 6px; background: rgba(192,154,78,0.75);"></div>
+            </div>
+            <div style="font-family: ui-monospace, monospace; font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(244,239,228,0.4); margin-top: 26px;">move your cursor to turn the tin</div>
+            <div style="width: min(320px, 80%); aspect-ratio: 3 / 2; margin-top: 22px; border: 1px solid rgba(244,239,228,0.12); border-radius: 3px; overflow: hidden;">
+              <image-slot id="hl-leaf" style="filter: saturate(0.62) contrast(0.96) brightness(0.78)" shape="rect" fit="cover" placeholder="Drop a dry-leaf or wet-leaf photograph" src="https://commons.wikimedia.org/wiki/Special:FilePath/Ilam_green.jpg?width=1800" credit="Ilam tea bushes · Wikimedia Commons, CC BY-SA 4.0" credit-href="https://commons.wikimedia.org/wiki/File:Ilam_green.jpg"></image-slot>
+            </div>
+          </div>
+
+          <div>
+            <div style="font-size: 10px; letter-spacing: 0.42em; text-transform: uppercase; color: #C09A4E;">Lot {{ detail.no }} · Ilam, Nepal</div>
+            <h2 style="font-family: 'EB Garamond', Georgia, serif; font-weight: 300; font-size: clamp(38px, 6vw, 78px); line-height: 1; margin: 20px 0 0;">{{ detail.name }}</h2>
+            <p style="max-width: 44ch; font-size: 15.5px; line-height: 1.85; color: rgba(244,239,228,0.7); font-weight: 300; margin: 24px 0 0;">{{ detail.note }}</p>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1px; margin-top: 36px; background: rgba(244,239,228,0.12);">
+              <sc-for list="{{ detailSpecs }}" as="s" hint-placeholder-count="5">
+                <div style="background: #0B1A13; padding: 20px 20px 22px;">
+                  <div style="font-size: 9px; letter-spacing: 0.24em; text-transform: uppercase; color: rgba(244,239,228,0.45);">{{ s.k }}</div>
+                  <div style="font-size: 14px; line-height: 1.55; color: #F4EFE4; margin-top: 9px; font-weight: 300;">{{ s.v }}</div>
+                </div>
+              </sc-for>
+            </div>
+            <div style="display: flex; flex-wrap: wrap; gap: 14px; margin-top: 34px;">
+              <div onClick="{{ quoteThis }}" style="font-size: 11px; letter-spacing: 0.24em; text-transform: uppercase; color: #0E2018; background: #C09A4E; padding: 17px 34px; border-radius: 999px; white-space: nowrap; cursor: pointer; transition: transform .5s, background .5s;" style-hover="background: #E3C489; transform: translateY(-3px);">Quote this lot</div>
+              <div onClick="{{ nextTea }}" style="font-size: 11px; letter-spacing: 0.24em; text-transform: uppercase; color: rgba(244,239,228,0.8); border: 1px solid rgba(244,239,228,0.24); padding: 17px 34px; border-radius: 999px; white-space: nowrap; cursor: pointer; transition: border-color .5s, color .5s;" style-hover="border-color: #C09A4E; color: #C09A4E;">Next lot</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ quoteOpen }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="Quote ceremony" style="{{ ceremonyStyle }}">
+      <div style="position: absolute; inset: 0; background: radial-gradient(70% 60% at 50% 100%, {{ brewGlow }}, rgba(8,21,15,0) 72%); transition: background 1.6s; pointer-events: none;"></div>
+      <div style="{{ brewFillStyle }}"></div>
+      <div style="position: absolute; left: 50%; bottom: 0; width: 240px; height: 40vh; transform: translateX(-50%); pointer-events: none; opacity: 0.7;">
+        <sc-for list="{{ steam }}" as="s" hint-placeholder-count="0">
+          <div style="{{ s.style }}"></div>
+        </sc-for>
+      </div>
+
+      <div style="position: relative; z-index: 2; min-height: 100vh; display: flex; flex-direction: column; padding: clamp(22px, 4vw, 44px) clamp(20px, 5vw, 64px);">
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 20px;">
+          <span style="font-family: 'EB Garamond', Georgia, serif; font-size: 17px; letter-spacing: 0.3em; text-transform: uppercase; color: rgba(244,239,228,0.8);">Himalayan Leaf</span>
+          <div onClick="{{ closeQuote }}" style="font-size: 10px; letter-spacing: 0.26em; text-transform: uppercase; color: rgba(244,239,228,0.55); cursor: pointer; transition: color .5s;" style-hover="color: #C09A4E;">Close</div>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 10px; margin-top: 26px;">
+          <sc-for list="{{ pips }}" as="p" hint-placeholder-count="8">
+            <div style="{{ p.style }}"></div>
+          </sc-for>
+        </div>
+
+        <div style="flex: 1; display: grid; place-items: center; padding: clamp(30px, 7vh, 80px) 0;">
+          <div style="{{ stepWrapStyle }}">
+            <div style="font-size: 10px; letter-spacing: 0.42em; text-transform: uppercase; color: #C09A4E;">{{ step.tag }}</div>
+            <h2 style="font-family: 'EB Garamond', Georgia, serif; font-weight: 300; font-size: clamp(32px, 5.4vw, 66px); line-height: 1.04; margin: 20px 0 0;">{{ step.q }}</h2>
+            <p style="max-width: 46ch; font-size: 14.5px; line-height: 1.8; color: rgba(244,239,228,0.62); font-weight: 300; margin: 16px 0 0;">{{ step.hint }}</p>
+
+            <sc-if value="{{ step.isChoice }}" hint-placeholder-val="{{ true }}">
+              <div style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 38px;">
+                <sc-for list="{{ step.options }}" as="o" hint-placeholder-count="4">
+                  <div onClick="{{ o.pick }}" style="{{ o.style }}">{{ o.label }}</div>
+                </sc-for>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ step.isText }}" hint-placeholder-val="{{ false }}">
+              <div style="display: grid; gap: 16px; margin-top: 38px; max-width: 560px;">
+                <sc-for list="{{ step.fields }}" as="f" hint-placeholder-count="1">
+                  <div>
+                    <div style="font-size: 9px; letter-spacing: 0.26em; text-transform: uppercase; color: rgba(244,239,228,0.45); margin-bottom: 10px;">{{ f.label }}</div>
+                    <input type="text" value="{{ f.value }}" onChange="{{ f.set }}" placeholder="{{ f.ph }}" style="width: 100%; background: transparent; border: none; border-bottom: 1px solid rgba(244,239,228,0.28); color: #F4EFE4; font-family: 'EB Garamond', Georgia, serif; font-size: 26px; font-weight: 300; padding: 8px 0 12px; outline: none;" style-focus="border-color: #C09A4E;" />
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ step.isNotes }}" hint-placeholder-val="{{ false }}">
+              <div style="margin-top: 38px; max-width: 620px;">
+                <textarea rows="4" value="{{ notesValue }}" onChange="{{ setNotes }}" placeholder="Anything else we should know — blend intentions, certification needs, sample requests." style="width: 100%; background: rgba(244,239,228,0.03); border: 1px solid rgba(244,239,228,0.18); border-radius: 3px; color: #F4EFE4; font-family: Karla, sans-serif; font-size: 15px; font-weight: 300; line-height: 1.7; padding: 18px; outline: none; resize: vertical;" style-focus="border-color: #C09A4E;"></textarea>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ step.isReview }}" hint-placeholder-val="{{ false }}">
+              <div style="margin-top: 36px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1px; background: rgba(244,239,228,0.12); max-width: 800px;">
+                <sc-for list="{{ summary }}" as="s" hint-placeholder-count="6">
+                  <div style="background: #0B1A13; padding: 18px 20px 20px;">
+                    <div style="font-size: 9px; letter-spacing: 0.24em; text-transform: uppercase; color: rgba(244,239,228,0.45);">{{ s.k }}</div>
+                    <div style="font-size: 14px; line-height: 1.55; color: #F4EFE4; margin-top: 8px; font-weight: 300;">{{ s.v }}</div>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ step.isDone }}" hint-placeholder-val="{{ false }}">
+              <div style="margin-top: 34px; font-family: ui-monospace, monospace; font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(244,239,228,0.5);">reference {{ ref }} · reply within two working days</div>
+            </sc-if>
+
+            <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 18px; margin-top: 44px;">
+              <div onClick="{{ next }}" style="{{ nextStyle }}">{{ nextLabel }}</div>
+              <sc-if value="{{ canBack }}" hint-placeholder-val="{{ true }}">
+                <div onClick="{{ back }}" style="font-size: 10px; letter-spacing: 0.26em; text-transform: uppercase; color: rgba(244,239,228,0.5); cursor: pointer; transition: color .5s;" style-hover="color: #C09A4E;">Back</div>
+              </sc-if>
+              <sc-if value="{{ step.skippable }}" hint-placeholder-val="{{ false }}">
+                <div onClick="{{ next }}" style="font-size: 10px; letter-spacing: 0.26em; text-transform: uppercase; color: rgba(244,239,228,0.35); cursor: pointer;" style-hover="color: rgba(244,239,228,0.6);">Skip</div>
+              </sc-if>
+            </div>
+          </div>
+        </div>
+
+        <div style="font-family: ui-monospace, monospace; font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(244,239,228,0.35);">{{ brewLabel }}</div>
+      </div>
+    </div>
+  </sc-if>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;accent&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#C09A4E&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;options&quot;:[&quot;#C09A4E&quot;,&quot;#B8873A&quot;,&quot;#D9B978&quot;,&quot;#8FA37A&quot;]},&quot;ambientLeaves&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Motion&quot;},&quot;motionIntensity&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:1,&quot;min&quot;:0.3,&quot;max&quot;:1.6,&quot;step&quot;:0.1,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Motion&quot;}}">
+class Component extends DCLogic {
+  static TEAS = [
+    { name: "Sencha Green", liquor: "#8FA83C", tin: "linear-gradient(90deg, #123A2A, #1E5E42 45%, #0D2E21)",
+      note: "Steamed in the Japanese manner at 1,750 m. Vegetal, sweet grass, a clean marine finish.",
+      grade: "Steamed green, first flush", harvest: "March – April", cup: "Pale jade, 60 s at 70 °C",
+      tonnage: "Up to 900 kg per season", price: "Indicative $46 – $58 / kg FOB Kathmandu" },
+    { name: "Silver Tips", liquor: "#D8C98A", tin: "linear-gradient(90deg, #8E9296, #DDE0E2 45%, #7E8286)",
+      note: "Unopened buds plucked at dawn, withered in shade. Honeysuckle, melon, almost weightless.",
+      grade: "White, bud only", harvest: "Late March", cup: "Pale champagne, 4 min at 80 °C",
+      tonnage: "Up to 180 kg per season", price: "Indicative $190 – $240 / kg FOB Kathmandu" },
+    { name: "Golden Tips", liquor: "#C98F2E", tin: "linear-gradient(90deg, #9A7420, #E8C46B 45%, #8E6A1C)",
+      note: "Golden-tipped second flush, slow oxidised. Stone fruit, muscatel, warm bread crust.",
+      grade: "Orthodox black, FTGFOP1", harvest: "May – June", cup: "Amber, 3 min at 90 °C",
+      tonnage: "Up to 1,200 kg per season", price: "Indicative $72 – $94 / kg FOB Kathmandu" },
+    { name: "Ruby Black", liquor: "#8E2A20", tin: "linear-gradient(90deg, #171512, #33302B 45%, #121110)",
+      note: "Autumn flush, fully oxidised in cool mountain air. Cocoa, dark cherry, long malty tail.",
+      grade: "Orthodox black, autumnal", harvest: "October – November", cup: "Deep russet, 4 min at 95 °C",
+      tonnage: "Up to 1,500 kg per season", price: "Indicative $54 – $68 / kg FOB Kathmandu" }
+  ];
+
+  state = { mx: 0.5, my: 0.5, scroll: 0, hover: null, view: "home", tea: 0, quote: false, step: 0, answers: {},
+    intro: true, introPct: 0, ripples: [], pouring: false };
+
+  componentDidMount() {
+    this._mm = (e) => {
+      if (this._raf) return;
+      this._raf = requestAnimationFrame(() => {
+        this._raf = null;
+        this.setState({ mx: e.clientX / window.innerWidth, my: e.clientY / window.innerHeight });
+      });
+    };
+    this._sc = () => {
+      if (this._sraf) return;
+      this._sraf = requestAnimationFrame(() => {
+        this._sraf = null;
+        this.setState({ scroll: window.scrollY });
+      });
+    };
+    this._t0 = Date.now();
+
+    this._tick = setInterval(() => {
+      const t = Date.now() - this._t0;
+      if (t > 3700) { clearInterval(this._tick); this.setState({ intro: false, introPct: 100 }); }
+      else this.setState({ introPct: Math.min(100, Math.round((t / 2500) * 100)) });
+    }, 90);
+    this._click = (e) => {
+      const id = Date.now() + Math.random();
+      this.setState((s) => ({ ripples: [...s.ripples, { id, x: e.clientX, y: e.clientY }] }));
+      setTimeout(() => this.setState((s) => ({ ripples: s.ripples.filter((r) => r.id !== id) })), 1100);
+    };
+    window.addEventListener("pointerdown", this._click, { passive: true });
+    window.addEventListener("mousemove", this._mm, { passive: true });
+    window.addEventListener("scroll", this._sc, { passive: true });
+    this._rs = () => this.setState({ vw: window.innerWidth, vh: window.innerHeight });
+    this._rs();
+    window.addEventListener("resize", this._rs, { passive: true });
+  }
+  componentWillUnmount() {
+    clearInterval(this._tick);
+    clearInterval(this._clock);
+    window.removeEventListener("mousemove", this._mm);
+    window.removeEventListener("scroll", this._sc);
+    window.removeEventListener("pointerdown", this._click);
+    window.removeEventListener("resize", this._rs);
+  }
+
+  pourTo(fn) {
+    this.setState({ pouring: true });
+    setTimeout(fn, 620);
+    setTimeout(() => this.setState({ pouring: false }), 1500);
+  }
+
+  scrollTo(id) {
+    const el = document.getElementById(id);
+    if (el) window.scrollTo({ top: el.offsetTop - 40, behavior: "smooth" });
+  }
+
+  get steps() {
+    return [
+      { key: "teas", tag: "One of seven", q: "Which lots interest you?", hint: "Pick as many as you like. We can quote them together or separately.", multi: true, options: Component.TEAS.map((t) => t.name) },
+      { key: "volume", tag: "Two of seven", q: "How much, to begin with?", hint: "First orders start at 50 kg across any combination of lots.", options: ["50 – 100 kg", "100 – 500 kg", "500 kg – 1 tonne", "Over 1 tonne", "Samples first"] },
+      { key: "packaging", tag: "Three of seven", q: "How should it arrive?", hint: "Bulk leaves the estate lot-sealed; tins arrive shelf-ready.", options: ["20 kg bulk chests", "50 g retail tins", "Private label", "Undecided"] },
+      { key: "destination", tag: "Four of seven", q: "Where are we shipping?", hint: "Country is enough for now — it sets duty and freight.", text: [{ key: "destination", label: "Destination country", ph: "Germany" }] },
+      { key: "company", tag: "Five of seven", q: "Who are we speaking with?", hint: "So the quote reaches the right desk.", text: [{ key: "company", label: "Company", ph: "Kessler Tea Import" }, { key: "role", label: "Your name and role", ph: "Anna Kessler, Head of Buying" }, { key: "email", label: "Email", ph: "anna@kesslertea.de" }] },
+      { key: "timeline", tag: "Six of seven", q: "When do you need it?", hint: "Flush timing decides which lots we can promise.", options: ["Within a month", "This quarter", "Next flush", "Just exploring"] },
+      { key: "notes", tag: "Seven of seven", q: "Anything else?", hint: "Optional. Certifications, blend intentions, sample sets.", notes: true, skippable: true },
+      { key: "review", tag: "Before you send", q: "Read it back", hint: "Change anything with Back, then send it to the estate.", review: true },
+      { key: "done", tag: "Steeped", q: "Your request is with us", hint: "We will come back with pricing, current availability and a sample set.", done: true }
+    ];
+  }
+
+  quoteVals() {
+    const steps = this.steps;
+    const i = Math.min(this.state.step, steps.length - 1);
+    const s = steps[i];
+    const a = this.state.answers;
+    const liquor = Component.TEAS[this.state.tea].liquor;
+    const prog = i / (steps.length - 1);
+
+    const setA = (k, v) => this.setState((st) => ({ answers: { ...st.answers, [k]: v } }));
+
+    const options = (s.options || []).map((label) => {
+      const cur = a[s.key];
+      const on = s.multi ? (cur || []).includes(label) : cur === label;
+      return {
+        label,
+        style: {
+          fontSize: "13px", letterSpacing: "0.06em", padding: "15px 26px", borderRadius: "999px", whiteSpace: "nowrap",
+          border: "1px solid " + (on ? "#C09A4E" : "rgba(244,239,228,0.22)"),
+          background: on ? "rgba(192,154,78,0.16)" : "transparent",
+          color: on ? "#E3C489" : "rgba(244,239,228,0.82)",
+          cursor: "pointer", fontWeight: 300,
+          transition: "all .5s cubic-bezier(.2,.8,.2,1)"
+        },
+        pick: () => {
+          if (s.multi) {
+            const cur2 = a[s.key] || [];
+            setA(s.key, cur2.includes(label) ? cur2.filter((x) => x !== label) : cur2.concat(label));
+          } else {
+            setA(s.key, label);
+            setTimeout(() => this.setState((st) => ({ step: st.step + 1 })), 380);
+          }
+        }
+      };
+    });
+
+    const fields = (s.text || []).map((f) => ({
+      label: f.label, ph: f.ph, value: a[f.key] || "",
+      set: (e) => setA(f.key, e.target.value)
+    }));
+
+    const filled = s.multi ? (a[s.key] || []).length > 0
+      : s.options ? !!a[s.key]
+      : s.text ? s.text.every((f) => (a[f.key] || "").trim().length > 0)
+      : true;
+
+    const summary = [
+      { k: "Lots", v: (a.teas || []).join(", ") || "Not stated" },
+      { k: "Volume", v: a.volume || "Not stated" },
+      { k: "Packaging", v: a.packaging || "Not stated" },
+      { k: "Destination", v: a.destination || "Not stated" },
+      { k: "Company", v: a.company || "Not stated" },
+      { k: "Contact", v: [a.role, a.email].filter(Boolean).join(" · ") || "Not stated" },
+      { k: "Timeline", v: a.timeline || "Not stated" },
+      { k: "Notes", v: a.notes || "None" }
+    ];
+
+    return {
+      quoteOpen: this.state.quote,
+      step: { tag: s.tag, q: s.q, hint: s.hint, skippable: !!s.skippable, options, fields,
+        isChoice: !!s.options, isText: !!s.text, isNotes: !!s.notes, isReview: !!s.review, isDone: !!s.done },
+      notesValue: a.notes || "",
+      setNotes: (e) => setA("notes", e.target.value),
+      summary,
+      ref: "HL-" + (2600 + (i * 7) + ((a.destination || "x").length * 13)),
+      brewLabel: s.done ? "Infusion complete" : `Steeping · ${Math.round(prog * 100)}%`,
+      brewGlow: liquor + (s.done ? "66" : "3A"),
+      brewFillStyle: {
+        position: "absolute", left: 0, right: 0, bottom: 0,
+        height: (prog * 100).toFixed(1) + "%",
+        background: `linear-gradient(180deg, ${liquor}00, ${liquor}30)`,
+        transition: "height 1.4s cubic-bezier(.4,0,.2,1)", pointerEvents: "none"
+      },
+      pips: steps.map((_, k) => ({
+        style: {
+          flex: 1, height: "2px", borderRadius: "2px",
+          background: k <= i ? "#C09A4E" : "rgba(244,239,228,0.14)",
+          transition: "background .7s"
+        }
+      })),
+      stepWrapStyle: {
+        width: "100%", maxWidth: "860px",
+        animation: "hl-unfurl .8s cubic-bezier(.2,.8,.2,1) both",
+        key: "step-" + i
+      },
+      nextLabel: s.done ? "Return to the estate" : s.review ? "Send to the estate" : filled ? "Continue" : "Choose to continue",
+      nextStyle: {
+        fontSize: "11px", letterSpacing: "0.24em", textTransform: "uppercase",
+        padding: "17px 36px", borderRadius: "999px", whiteSpace: "nowrap",
+        background: filled ? "#C09A4E" : "rgba(244,239,228,0.08)",
+        color: filled ? "#0E2018" : "rgba(244,239,228,0.4)",
+        cursor: filled ? "pointer" : "default",
+        transition: "all .5s"
+      },
+      canBack: i > 0 && !s.done,
+      back: () => this.setState((st) => ({ step: Math.max(0, st.step - 1) })),
+      next: () => {
+        if (!filled) return;
+        if (s.done) { this.setState({ quote: false, step: 0 }); return; }
+        this.setState((st) => ({ step: Math.min(steps.length - 1, st.step + 1) }));
+      },
+      closeQuote: () => this.setState({ quote: false }),
+      ceremonyStyle: {
+        position: "fixed", inset: 0, zIndex: 60, overflowY: "auto",
+        background: "linear-gradient(180deg, #0B1A13, #08150F)",
+        animation: "hl-rise .6s cubic-bezier(.2,.8,.2,1) both"
+      }
+    };
+  }
+
+  timelapseVals() {
+    const fp = (n) => "https://commons.wikimedia.org/wiki/Special:FilePath/" + n + "?width=2000";
+    const frames = [
+      { src: fp("Kanyam_ilam,nepal.jpg"), alt: "Tea gardens above Kanyam, Ilam", ox: 46, oy: 52 },
+      { src: fp("Tea_garden_kanyam_ilam_Nepal.jpg"), alt: "Kanyam tea garden under cloud", ox: 54, oy: 46 },
+      { src: fp("Kanyam_hills_of_Queen,ilam_9.jpg"), alt: "The hills of Kanyam, Ilam", ox: 50, oy: 58 },
+      { src: fp("Beautiful_garden_ilam.jpg"), alt: "Ilam garden at first light", ox: 44, oy: 50 }
+    ];
+    const n = frames.length;
+    const HOLD = 9;                       // seconds per frame
+    const lean = (this.state.mx - 0.5) * 2;
+    const scroll = this.state.scroll;
+
+    // opacity + push-in run as CSS keyframes so they never stall on a paused frame clock
+    const timelapse = frames.map((fr, i) => ({
+      src: fr.src, alt: fr.alt,
+      style: {
+        position: "absolute", inset: 0, width: "100%", height: "100%",
+        objectFit: "cover", objectPosition: fr.ox + "% " + fr.oy + "%",
+        opacity: 0,
+        filter: "saturate(0.62) contrast(0.98) brightness(0.72)",
+        animation: `hl-timelapse ${HOLD * n}s ${(i * HOLD).toFixed(0)}s linear infinite`,
+        willChange: "opacity, transform"
+      }
+    }));
+
+    return {
+      timelapse,
+      tlDriftStyle: {
+        position: "absolute", inset: 0,
+        transform: `translate3d(${(lean * 14).toFixed(1)}px, ${(scroll * 0.05).toFixed(1)}px, 0)`,
+        transition: "transform 1.2s cubic-bezier(.2,.8,.2,1)"
+      }
+    };
+  }
+
+  ascentVals() {
+    const el = typeof document !== "undefined" ? document.getElementById("ascent") : null;
+    const vh = typeof window !== "undefined" ? window.innerHeight : 800;
+    let p = 0;
+    if (el) {
+      const span = el.offsetHeight - vh;
+      p = Math.min(1, Math.max(0, (this.state.scroll - el.offsetTop) / (span || 1)));
+    }
+    const lean = (this.state.mx - 0.5) * 2;
+    const alt = Math.round(240 + p * 1860);
+    const lines = [
+      { at: 0, t: "The road out of Ilam bazaar" },
+      { at: 0.3, t: "Where the gardens begin" },
+      { at: 0.58, t: "Cloud sits here until eleven" },
+      { at: 0.82, t: "The oldest bushes on the ridge" }
+    ];
+    const cur = lines.filter((l) => p >= l.at).slice(-1)[0] || lines[0];
+
+    const ridges = [
+      { c: "#1D4231", h: 30, s: 0.06, o: 0.9 },
+      { c: "#16362A", h: 42, s: 0.16, o: 1 },
+      { c: "#102A20", h: 56, s: 0.32, o: 1 },
+      { c: "#0A1D15", h: 72, s: 0.55, o: 1 },
+      { c: "#061109", h: 92, s: 0.85, o: 1 }
+    ].map((b, i) => ({
+      style: {
+        position: "absolute", left: "-18%", right: "-18%", bottom: (-14 + p * b.s * 62).toFixed(1) + "%",
+        height: b.h + "%",
+        background: b.c,
+        borderRadius: (48 + i * 6) + "% " + (52 - i * 5) + "% 0 0 / " + (86 + i * 3) + "% " + (72 + i * 4) + "% 0 0",
+        transform: `translate3d(${(lean * (8 + i * 12)).toFixed(1)}px, 0, 0) scale(${1 + p * b.s * 0.5})`,
+        transition: "transform 1s cubic-bezier(.2,.8,.2,1), bottom .5s linear",
+        opacity: b.o
+      }
+    }));
+
+    const narrow = (this.state.vw || 1200) < 760;
+
+    const fp = (n) => "https://commons.wikimedia.org/wiki/Special:FilePath/" + n + "?width=1800";
+    const photos = [
+      { id: "hl-asc-1", src: fp("Kanyam_ilam,nepal.jpg"), ph: "Lower gardens", at: 0 },
+      { id: "hl-asc-2", src: fp("Tea_garden_views.jpg"), ph: "Mid-slope gardens", at: 0.36 },
+      { id: "hl-asc-3", src: fp("An_evening_at_tea_garden_of_kanyam.jpg"), ph: "Ridge at evening", at: 0.72 }
+    ];
+    const ascentPhotos = photos.map((ph, i) => {
+      const span = 0.36;
+      const d = Math.abs(p - ph.at);
+      const on = i === 0 ? p < ph.at + span : (i === photos.length - 1 ? p >= ph.at - span * 0.5 : d < span);
+      return {
+        id: ph.id, src: ph.src, ph: ph.ph,
+        style: {
+          position: "absolute", inset: 0, zIndex: 0,
+          opacity: on ? Math.max(0.3, 0.86 - d * 1.1) : 0,
+          transform: `scale(${(1.06 + p * 0.14).toFixed(3)}) translate3d(${(lean * 12).toFixed(1)}px, ${((p - ph.at) * -60).toFixed(1)}px, 0)`,
+          transition: "opacity 1.4s cubic-bezier(.4,0,.2,1), transform 1s cubic-bezier(.2,.8,.2,1)",
+          filter: "saturate(0.5) contrast(0.94) brightness(0.62) hue-rotate(-8deg)",
+          maskImage: "linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.45) 16%, #000 46%, rgba(0,0,0,0.55) 78%, transparent 100%)",
+          WebkitMaskImage: "linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.45) 16%, #000 46%, rgba(0,0,0,0.55) 78%, transparent 100%)",
+          pointerEvents: "none"
+        }
+      };
+    });
+
+    return {
+      ascentPhotos,
+      altitude: alt.toLocaleString(),
+      ascentLine: cur.t,
+      ascentSectionStyle: {
+        position: "relative", height: narrow ? "220vh" : "320vh", background: "#0A1912"
+      },
+      ascentLineStyle: {
+        fontFamily: "'EB Garamond', Georgia, serif", fontWeight: 400,
+        fontSize: narrow ? "clamp(22px, 6.4vw, 30px)" : "clamp(26px, 3.6vw, 50px)",
+        lineHeight: 1.2, margin: narrow ? "22px 0 0" : "34px 0 0",
+        color: "#F4EFE4", transition: "opacity .6s", textWrap: "pretty"
+      },
+      ascentMarksStyle: narrow
+        ? { position: "absolute", left: "clamp(20px, 6vw, 40px)", right: "clamp(20px, 6vw, 40px)", bottom: "34px",
+            display: "flex", gap: "6px", alignItems: "stretch" }
+        : { position: "absolute", right: "clamp(18px, 4vw, 48px)", top: "50%", transform: "translateY(-50%)",
+            display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "14px" },
+      altStyle: {
+        fontFamily: "'EB Garamond', Georgia, serif", fontWeight: 400,
+        fontSize: narrow ? "clamp(56px, 20vw, 96px)" : "clamp(64px, 12vw, 168px)",
+        lineHeight: 0.9, color: "#C09A4E"
+      },
+      ascentSkyStyle: {
+        position: "absolute", inset: 0,
+        background: `linear-gradient(180deg, rgba(${Math.round(28 + p * 90)},${Math.round(58 + p * 92)},${Math.round(48 + p * 88)},1) 0%, #0A1912 68%)`,
+        transition: "background .6s linear"
+      },
+      ascentMarks: lines.map((l) => ({
+        label: narrow ? (240 + Math.round(l.at * 1860)).toLocaleString() : (240 + Math.round(l.at * 1860)).toLocaleString() + " m · " + l.t,
+        style: narrow
+          ? { flex: 1, fontSize: "9px", letterSpacing: "0.12em", paddingTop: "9px",
+              color: p >= l.at ? "#C09A4E" : "rgba(244,239,228,0.3)",
+              borderTop: "1px solid " + (p >= l.at ? "#C09A4E" : "rgba(244,239,228,0.18)"),
+              transition: "all .6s", textAlign: "left" }
+          : { fontSize: "10px", letterSpacing: "0.2em", textTransform: "uppercase",
+              color: p >= l.at ? "#C09A4E" : "rgba(244,239,228,0.28)",
+              borderRight: "1px solid " + (p >= l.at ? "#C09A4E" : "rgba(244,239,228,0.18)"),
+              paddingRight: "12px", transition: "all .6s", textAlign: "right", maxWidth: "34vw" }
+      }))
+    };
+  }
+
+  renderVals() {
+    const { mx, my, scroll } = this.state;
+    const lean = (mx - 0.5) * 2;
+
+    const steam = [0, 1, 2, 3, 4, 5, 6].map((i) => {
+      const x = 16 + i * 40;
+      const w = 10 + (i % 3) * 6;
+      return {
+        style: {
+          position: "absolute",
+          left: x + "px",
+          bottom: 0,
+          width: w + "px",
+          height: "180px",
+          borderRadius: "50%",
+          background: "linear-gradient(180deg, rgba(244,239,228,0) 0%, rgba(244,239,228,0.5) 45%, rgba(244,239,228,0) 100%)",
+          filter: "blur(11px)",
+          animation: `hl-steam ${7 + (i % 4) * 1.6}s ${i * 0.85}s ease-out infinite`,
+          "--dx": (lean * 90 + (i - 3) * 10).toFixed(1) + "px",
+          "--rot": (lean * 22).toFixed(1) + "deg",
+          transform: `translateX(${(lean * (8 + i * 3)).toFixed(1)}px)`,
+          transition: "transform 1.4s cubic-bezier(.2,.8,.2,1)"
+        }
+      };
+    });
+
+    const bands = [
+      { c: "#163024", h: 34, o: 0.02, b: 0 },
+      { c: "#14382A", h: 46, o: 0.05, b: 0 },
+      { c: "#0F2C21", h: 60, o: 0.09, b: 0 },
+      { c: "#0A1B14", h: 78, o: 0.16, b: 0 }
+    ];
+    const hills = bands.map((b, i) => ({
+      style: {
+        position: "absolute",
+        left: "-14%",
+        right: "-14%",
+        bottom: 0,
+        height: b.h + "%",
+        background: b.c,
+        borderRadius: "58% 42% 0 0 / 90% 74% 0 0",
+        transform: `translate3d(${(lean * (10 + i * 14)).toFixed(1)}px, ${(scroll * b.o).toFixed(1)}px, 0) scaleX(${1 + i * 0.06})`,
+        transition: "transform 1.2s cubic-bezier(.2,.8,.2,1)",
+        boxShadow: "0 -1px 40px rgba(0,0,0,0.35)"
+      }
+    }));
+
+    const drift = [0, 1, 2, 3, 4, 5, 6, 7].map((i) => ({
+      style: {
+        position: "absolute",
+        top: 0,
+        left: (4 + i * 12.5) + "%",
+        width: (7 + (i % 3) * 3) + "px",
+        height: (16 + (i % 4) * 6) + "px",
+        borderRadius: "80% 12% 80% 12%",
+        background: i % 2 ? "rgba(192,154,78,0.5)" : "rgba(122,160,120,0.45)",
+        filter: "blur(0.4px)",
+        animation: `hl-drift ${26 + (i % 5) * 7}s ${i * 3.4}s linear infinite`,
+        "--dx": ((i % 2 ? 1 : -1) * (60 + i * 18)) + "px",
+        "--spin": (300 + i * 90) + "deg"
+      }
+    }));
+
+    const TEAS = Component.TEAS;
+    const hov = this.state.hover;
+    const active = hov == null ? null : TEAS[hov];
+
+    const steepStyle = {
+      position: "absolute",
+      inset: 0,
+      background: active
+        ? `radial-gradient(80% 70% at ${(hov * 25 + 12)}% 45%, ${active.liquor} 0%, rgba(14,32,24,0) 68%)`
+        : "radial-gradient(80% 70% at 50% 45%, rgba(27,58,44,0.5) 0%, rgba(14,32,24,0) 68%)",
+      opacity: active ? 0.9 : 0.7,
+      transition: "background 1.5s cubic-bezier(.4,0,.2,1), opacity 1.2s"
+    };
+
+    const teas = TEAS.map((t, i) => ({
+      ...t,
+      no: "0" + (i + 1),
+      cardStyle: {
+        position: "relative",
+        overflow: "hidden",
+        minHeight: "430px",
+        padding: "26px 24px 28px",
+        borderRadius: "3px",
+        border: "1px solid " + (hov === i ? "rgba(192,154,78,0.55)" : "rgba(244,239,228,0.12)"),
+        background: hov === i ? "rgba(244,239,228,0.07)" : "rgba(244,239,228,0.025)",
+        cursor: "pointer",
+        transform: hov === i ? `perspective(900px) translateY(-14px) rotateY(${(lean * 7).toFixed(1)}deg) rotateX(${((0.5 - my) * 6).toFixed(1)}deg) scale(1.02)` : "perspective(900px)",
+        transition: "transform .8s cubic-bezier(.2,.8,.2,1), background .8s, border-color .8s",
+        boxShadow: hov === i ? "0 30px 70px -30px rgba(0,0,0,0.7)" : "none"
+      },
+      dotStyle: {
+        width: "9px", height: "9px", borderRadius: "50%", background: t.liquor,
+        boxShadow: hov === i ? `0 0 0 6px ${t.liquor}33` : "none", transition: "box-shadow .8s"
+      },
+      tinStyle: {
+        width: "84px", height: "150px", margin: "0 auto",
+        display: "flex", flexDirection: "column", alignItems: "center",
+        borderRadius: "5px",
+        background: t.tin,
+        boxShadow: "inset -14px 0 24px rgba(0,0,0,0.34), inset 12px 0 18px rgba(255,255,255,0.18), 0 24px 40px -22px rgba(0,0,0,0.8)",
+        transform: hov === i ? "rotateY(-16deg) rotateZ(-2deg) scale(1.06)" : "rotateY(0deg)",
+        transformStyle: "preserve-3d",
+        transition: "transform 1s cubic-bezier(.2,.8,.2,1)"
+      },
+      hover: () => this.setState({ hover: i }),
+      open: () => { this.setState({ tea: i }); this.pourTo(() => { this.setState({ view: "tea" }); window.scrollTo({ top: 0 }); }); }
+    }));
+
+    return {
+      steam, hills, drift, teas, steepStyle,
+      ...this.ascentVals(),
+      intro: this.state.intro,
+      introLabel: this.state.introPct + "%",
+      pouring: this.state.pouring,
+      veilStyle: {
+        position: "absolute", inset: 0,
+        background: `linear-gradient(180deg, ${Component.TEAS[this.state.tea].liquor} 0%, #5A2A14 62%, #08150F 100%)`,
+        boxShadow: "0 30px 90px rgba(0,0,0,0.6)",
+        animation: "hl-veil-in 1.5s cubic-bezier(.6,0,.3,1) both"
+      },
+      ...this.timelapseVals(),
+      heroPhotoStyle: {
+        position: "absolute", left: 0, right: 0, bottom: 0, height: "26vh",
+        opacity: 0.8, zIndex: 1,
+        filter: "saturate(0.5) contrast(0.95) brightness(0.6) hue-rotate(-8deg)",
+        maskImage: "linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.35) 30%, rgba(0,0,0,0.9) 66%, rgba(0,0,0,0.5) 100%)",
+        WebkitMaskImage: "linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.35) 30%, rgba(0,0,0,0.9) 66%, rgba(0,0,0,0.5) 100%)",
+        transform: `translate3d(${(lean * 10).toFixed(1)}px, ${(scroll * 0.06).toFixed(1)}px, 0)`,
+        transition: "transform 1.2s cubic-bezier(.2,.8,.2,1)"
+      },
+      cursorStyle: {
+        position: "fixed", zIndex: 80, pointerEvents: "none",
+        left: 0, top: 0, width: "230px", height: "230px", marginLeft: "-115px", marginTop: "-115px",
+        borderRadius: "50%",
+        background: "radial-gradient(circle, rgba(192,154,78,0.18) 0%, rgba(192,154,78,0.06) 40%, rgba(192,154,78,0) 70%)",
+        transform: `translate3d(${(mx * 100).toFixed(2)}vw, ${(my * 100).toFixed(2)}vh, 0)`,
+        transition: "transform .55s cubic-bezier(.2,.8,.2,1)",
+        mixBlendMode: "screen"
+      },
+      ripples: this.state.ripples.map((r) => ({
+        style: {
+          position: "absolute", left: r.x + "px", top: r.y + "px",
+          width: "120px", height: "120px", borderRadius: "50%",
+          border: "1px solid rgba(192,154,78,0.6)",
+          animation: "hl-ripple 1.05s cubic-bezier(.2,.8,.2,1) both"
+        }
+      })),
+      facts: [
+        { v: "1,400–2,100 m", k: "Elevation" },
+        { v: "4", k: "Orthodox lots" },
+        { v: "100%", k: "Hand-plucked" }
+      ],
+      ritual: [
+        { n: "I", t: "Warm the vessel", d: "Rinse pot and cups with the water you will brew with. Cold glass flattens the first infusion.", m: "30 seconds" },
+        { n: "II", t: "Measure the leaf", d: "Three grams to 150 ml. Orthodox leaf is whole, so it needs room to open.", m: "3 g / 150 ml" },
+        { n: "III", t: "Pour and wait", d: "Water off the boil for green and white, full boil for black. Watch the leaf unfurl rather than the clock.", m: "70–95 °C" },
+        { n: "IV", t: "Cup and read", d: "Nose the wet leaf first, then the liquor. Note colour, body and how long the finish holds.", m: "Second infusion" }
+      ],
+      offers: [
+        { t: "Bulk chests", d: "20 kg foil-lined chests, lot-sealed at the estate with garden mark and invoice-grade tasting notes.", m: "From 50 kg" },
+        { t: "Retail tins", d: "The 50 g Himalayan Leaf tin, cased 24 units. Ready for shelf with no repacking.", m: "From 240 tins" },
+        { t: "Private label", d: "Your artwork on our tins or your own packaging filled at origin. Plates and proofs in three weeks.", m: "From 500 units" }
+      ],
+      estateFrames: [
+        { n: "Kanyam_in_Clouds.jpg", alt: "Kanyam under cloud", ox: 50, oy: 54 },
+        { n: "Evening_and_cloud.jpg", alt: "Evening cloud over the gardens", ox: 52, oy: 48 },
+        { n: "Mist_vally_tea_industry.jpg", alt: "Mist in the tea valley", ox: 48, oy: 56 },
+        { n: "Tea_garden_kanyam_ilam_Nepal.jpg", alt: "Cloud clearing off the Kanyam garden", ox: 54, oy: 50 }
+      ].map((fr, i) => ({
+        src: "https://commons.wikimedia.org/wiki/Special:FilePath/" + fr.n + "?width=1800",
+        alt: fr.alt,
+        style: {
+          position: "absolute", inset: 0, width: "100%", height: "100%",
+          objectFit: "cover", objectPosition: fr.ox + "% " + fr.oy + "%",
+          opacity: 0,
+          filter: "saturate(0.6) contrast(0.97) brightness(0.76)",
+          animation: `hl-timelapse 32s ${i * 8}s linear infinite`,
+          willChange: "opacity, transform"
+        }
+      })),
+      estateGhostStyle: {
+        position: "absolute", right: "-2vw", bottom: "-3%", zIndex: 0, pointerEvents: "none",
+        maxWidth: "46vw", overflow: "hidden", textAlign: "right",
+        fontFamily: "'EB Garamond', Georgia, serif", fontSize: "clamp(96px, 16vw, 260px)",
+        lineHeight: 0.8, letterSpacing: "0.06em", color: "rgba(192,154,78,0.04)",
+        transform: `translate3d(${(lean * -18).toFixed(1)}px, ${((scroll % 3000) * -0.03).toFixed(1)}px, 0)`,
+        transition: "transform 1.2s cubic-bezier(.2,.8,.2,1)"
+      },
+      estateFrameStyle: {
+        position: "relative", height: "clamp(360px, 66vh, 640px)", overflow: "hidden",
+        borderRadius: "3px 0 0 3px",
+        marginRight: "calc(-1 * clamp(20px, 5vw, 64px))",
+        boxShadow: "0 50px 90px -50px rgba(0,0,0,0.9)",
+        transform: `translate3d(0, ${((scroll % 3000) * 0.012).toFixed(1)}px, 0)`,
+        transition: "transform 1s cubic-bezier(.2,.8,.2,1)"
+      },
+      estateCloudStyle: {
+        position: "absolute", left: "-25%", right: "-25%", top: "4%", height: "58%",
+        pointerEvents: "none", filter: "blur(30px)", opacity: 0.5,
+        background: "radial-gradient(58% 100% at 34% 50%, rgba(244,239,228,0.34), transparent 74%), radial-gradient(46% 86% at 76% 42%, rgba(244,239,228,0.22), transparent 76%)",
+        animation: "hl-cloud-a 52s ease-in-out infinite alternate"
+      },
+      parallaxStyle: {
+        position: "absolute", inset: "-8%",
+        background: "radial-gradient(70% 55% at 40% 30%, rgba(122,160,120,0.28), transparent 70%), radial-gradient(60% 50% at 75% 78%, rgba(192,154,78,0.2), transparent 70%)",
+        transform: `translate3d(${(lean * 18).toFixed(1)}px, ${((scroll % 2000) * 0.02).toFixed(1)}px, 0)`,
+        transition: "transform 1.2s cubic-bezier(.2,.8,.2,1)"
+      },
+      leave: () => this.setState({ hover: null }),
+      showTea: this.state.view === "tea",
+      detail: { ...TEAS[this.state.tea], no: "0" + (this.state.tea + 1) },
+      detailGlow: TEAS[this.state.tea].liquor + "44",
+      detailSpecs: [
+        { k: "Grade", v: TEAS[this.state.tea].grade },
+        { k: "Harvest", v: TEAS[this.state.tea].harvest },
+        { k: "In the cup", v: TEAS[this.state.tea].cup },
+        { k: "Availability", v: TEAS[this.state.tea].tonnage },
+        { k: "Pricing", v: TEAS[this.state.tea].price }
+      ],
+      sheetStyle: {
+        position: "fixed", inset: 0, zIndex: 40, overflowY: "auto",
+        background: "linear-gradient(180deg, #0B1A13, #08150F)",
+        animation: "hl-rise .7s cubic-bezier(.2,.8,.2,1) both"
+      },
+      bigTinStyle: {
+        width: "150px", height: "270px",
+        display: "flex", flexDirection: "column", alignItems: "center",
+        borderRadius: "9px",
+        background: TEAS[this.state.tea].tin,
+        boxShadow: "inset -26px 0 44px rgba(0,0,0,0.42), inset 22px 0 34px rgba(255,255,255,0.2), 0 50px 70px -34px rgba(0,0,0,0.85)",
+        transform: `rotateY(${(lean * -26).toFixed(1)}deg) rotateX(${((my - 0.5) * 12).toFixed(1)}deg)`,
+        transition: "transform .9s cubic-bezier(.2,.8,.2,1)"
+      },
+      closeTea: () => this.pourTo(() => this.setState({ view: "home", hover: null })),
+      nextTea: () => this.pourTo(() => this.setState((s) => ({ tea: (s.tea + 1) % 4 }))),
+      quoteThis: () => this.setState((s) => ({ quote: true, step: 0, answers: { ...s.answers, teas: [TEAS[s.tea].name] } })),
+      ...this.quoteVals(),
+      navItems: [
+        { label: "Estate", go: () => this.scrollTo("estate"), keep: 820 },
+        { label: "The Teas", go: () => this.scrollTo("collection"), keep: 0 },
+        { label: "Ascent", go: () => this.scrollTo("ascent"), keep: 1180 },
+        { label: "Ritual", go: () => this.scrollTo("ritual"), keep: 1180 },
+        { label: "Private Label", go: () => this.scrollTo("wholesale"), keep: 1060 }
+      ].filter((n) => (this.state.vw || 1400) >= n.keep),
+      showCue: (this.state.vh || 900) >= 660,
+      goHome: () => window.scrollTo({ top: 0, behavior: "smooth" }),
+      goCollection: () => this.scrollTo("collection"),
+      openQuote: () => this.setState({ quote: true, step: 0 })
+    };
+  }
+}
+
+</script>
+</body>
+</html>
